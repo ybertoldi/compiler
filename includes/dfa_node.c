@@ -45,7 +45,7 @@ void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t){
   char *invchars;
   bool az, AZ, nums;
 
-  to_addlen = strchr(expr, '[') ? (expr - strchr(expr, '[')) : strlen(expr);
+  to_addlen = strchr(expr, '[') ? (strchr(expr, '[') - expr) : strlen(expr);
   i = -1;
   while (++i < to_addlen)
     dfa_add_delta(s, expr[i], t);
