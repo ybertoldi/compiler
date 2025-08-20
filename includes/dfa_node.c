@@ -87,13 +87,13 @@ void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t){
 
   if (AZ) {
     for (i = 0; i < 26; i++)
-      if (!invchars['a'+i])
+      if (!invchars['A'+i])
         dfa_add_delta(s, i + 'A', t);
   }
 
   if (nums) {
     for (i = 0; i < 10; i++)
-      if (!invchars['a'+i])
+      if (!invchars['0'+i])
         dfa_add_delta(s, i + '0', t);
   }
 

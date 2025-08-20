@@ -406,7 +406,7 @@ int main(){
 
 
 /*--------------------------ANALISE LEXICA------------------------------*/
-  char *eval = "if (cont > 10) {";
+  char *eval = "if (cont > 10) { +-/% & >> <<  > >= < <= == && || sou_uma_variavel = 0x23fab - 0432;}";
   TokenList *tkns = tokenize(eval, &q0);
   TokenList *curlist = tkns;
   for (; curlist; curlist = curlist->next){
