@@ -43,7 +43,7 @@ typedef  enum {
                    //
   //VARIAVEIS E NUMS
   TKTYPE_VAR,
-  TKTYPE_ATTRIBUTE,
+  TKTYPE_ATTRIBUTION,
   TKTYPE_INT,
   TKTYPE_FLOAT,
   TKTYPE_HEXINT,
@@ -135,8 +135,8 @@ char *print_type(TKTYPE t) {
     return "TKTYPE_NEGATION";
   case TKTYPE_VAR:
     return "TKTYPE_VAR";
-  case TKTYPE_ATTRIBUTE:
-    return "TKTYPE_ATTRIBUTE";
+  case TKTYPE_ATTRIBUTION:
+    return "TKTYPE_ATTRIBUTION";
   case TKTYPE_INT:
     return "TKTYPE_INT";
   case TKTYPE_FLOAT:
@@ -260,7 +260,7 @@ int main(){
   DfaNode q25 = BUILD_DFA_NODE_FINAL(TKTYPE_LOGIC_AND);
 
   DfaNode q26 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);
-  DfaNode q27 = BUILD_DFA_NODE_FINAL(TKTYPE_ATTRIBUTE);
+  DfaNode q27 = BUILD_DFA_NODE_FINAL(TKTYPE_ATTRIBUTION);
 
   DfaNode q28 = BUILD_DFA_NODE_FINAL(TKTYPE_INT); //0 (pode comecar um octal o hexa)
   DfaNode q29 = BUILD_DFA_NODE_FINAL(TKTYPE_INT);
@@ -380,7 +380,7 @@ int main(){
   dfa_add_delta(&q15, '&', &q25);
   
   /*-----VARIAVEIS------*/
-  dfa_add_delta_expr(&q0, "_[A-Za-z]", &q26); //^ieftscw
+  dfa_add_delta_expr(&q0, "_[A-Za-z]^iefwsc", &q26); 
   dfa_add_delta_expr(&q26, "_[A-Za-z]", &q26);
 
   dfa_add_delta(&q0, '=', &q27); //atribuicao
@@ -393,7 +393,7 @@ int main(){
   dfa_add_delta(&q29, '.', &q30);
   dfa_add_delta_expr(&q30, "[0-9]", &q30);
 
-  //int em hexa ou octal. (ou simplesmente o numero 0)
+  //ou int em hexa/octal. ou float so com casas decimais. ou simplesmente o numero 0
   dfa_add_delta(&q0, '0', &q28);
   dfa_add_delta_expr(&q28, "[0-9]", &q32);
   dfa_add_delta_expr(&q32, "[0-9]", &q32);
@@ -401,17 +401,63 @@ int main(){
   dfa_add_delta(&q28, 'x', &q31);
   dfa_add_delta_expr(&q31, "ABCDEFabcdef[0-9]", &q31);
 
-  /*----------------------PALAVRAS RESERVADAS-----------------------*/
-  //TODO
+  dfa_add_delta(&q28, '.', &q30);
 
+  /*----------------------PALAVRAS RESERVADAS-----------------------*/
+  dfa_add_delta(&q0, 'i', &q33);
+  dfa_add_delta_orelse(&q33, 'f', &q34, &q26);
+  dfa_add_delta_expr(&q34, "_[A-Za-z0-9]", &q26);
+
+
+  dfa_add_delta(&q0, 'e', &q35);
+  dfa_add_delta_orelse(&q35, 'l', &q36, &q26);
+  dfa_add_delta_orelse(&q36, 's', &q37, &q26);
+  dfa_add_delta_orelse(&q37, 'e', &q38, &q26);
+  dfa_add_delta_expr(&q38, "_[A-Za-z0-9]", &q26);
+
+  dfa_add_delta(&q0, 'f', &q39);
+  dfa_add_delta(&q39, 'o', &q40);
+  dfa_add_delta_expr(&q39, "_[A-Za-z0-9]^oal", &q26); // for, false e float
+
+  dfa_add_delta_orelse(&q40, 'r', &q41, &q26);
+  dfa_add_delta_expr(&q41, "_[A-Za-z0-9]", &q26);
+
+  dfa_add_delta(&q0, 'w', &q42);
+  dfa_add_delta_orelse(&q42, 'h', &q43, &q26);
+  dfa_add_delta_orelse(&q43, 'i', &q44, &q26);
+  dfa_add_delta_orelse(&q44, 'l', &q45, &q26);
+  dfa_add_delta_orelse(&q45, 'e', &q46, &q26);
+  dfa_add_delta_expr(&q46, "_[A-Za-z0-9]", &q26);
+
+  dfa_add_delta(&q0, 's', &q47);
+  dfa_add_delta_orelse(&q47, 'w', &q48, &q26);
+  dfa_add_delta_orelse(&q48, 'i', &q49, &q26);
+  dfa_add_delta_orelse(&q49, 't', &q50, &q26);
+  dfa_add_delta_orelse(&q50, 'c', &q51, &q26);
+  dfa_add_delta_orelse(&q51, 'h', &q52, &q26);
+  dfa_add_delta_expr(&q52, "_[A-Za-z0-9]", &q26);
+
+  dfa_add_delta(&q0, 'c', &q53);
+  dfa_add_delta_orelse(&q53, 'a', &q54, &q26);
+  dfa_add_delta_orelse(&q54, 's', &q55, &q26);
+  dfa_add_delta_orelse(&q55, 'e', &q56, &q26);
+  dfa_add_delta_expr(&q56, "_[A-Za-z0-9]", &q26);
+
+  // false
+  dfa_add_delta(&q39, 'a', &q57);
+  dfa_add_delta_orelse(&q57, 'l', &q58, &q26);
+  dfa_add_delta_orelse(&q58, 's', &q59, &q26);
+  dfa_add_delta_orelse(&q59, 'e', &q60, &q26);
+  dfa_add_delta_expr(&q60, "_[A-Za-z0-9]", &q26);
 
 /*--------------------------ANALISE LEXICA------------------------------*/
-  char *eval = "if (cont > 10) { +-/% & >> <<  > >= < <= == && || sou_uma_variavel = 0x23fab - 0432;}";
+  char *eval = "if (cont > 10) { +-/% & >> <<  > >= < <= == && || \n\t\tsou_uma_variavel=0x23fab - 0432;} meufloat=4.5;";
   TokenList *tkns = tokenize(eval, &q0);
   TokenList *curlist = tkns;
   for (; curlist; curlist = curlist->next){
     printf("TOKEN(lexeme=\"%s\", type=%s)\n", curlist->lexeme, print_type(curlist->type));
   }
+  printf("texto original: \"%s\"\n", eval);
 
 /*------------------------ANALISE SINTATICA----------------------------*/
   //TODO...
