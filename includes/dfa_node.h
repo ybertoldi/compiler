@@ -8,10 +8,10 @@
 
 
 #define BUILD_DFA_NODE(s_name)                                                 \
-  {.name = s_name, .map = init_dfa_map(), .is_final = false}
+  {.type = s_name, .map = init_dfa_map(), .is_final = false}
 
 #define BUILD_DFA_NODE_FINAL(s_name)                                           \
-  {.name = s_name, .map = init_dfa_map(), .is_final = true}
+  {.type = s_name, .map = init_dfa_map(), .is_final = true}
 
 
 
@@ -22,7 +22,7 @@ typedef struct dfa_node_map {
 } DfaMap;
 
 typedef struct dfa_node {
-  char *name;
+  int type;
   struct dfa_node_map map;
   bool is_final;
 } DfaNode;

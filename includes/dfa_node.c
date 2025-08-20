@@ -42,7 +42,7 @@ void dfa_add_delta(DfaNode *node, char key, DfaNode *value) {
  */
 void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t){
   int i, to_addlen, l;
-  char *invchars;
+  char invchars[256] = {0};
   bool az, AZ, nums;
 
   to_addlen = strchr(expr, '[') ? (strchr(expr, '[') - expr) : strlen(expr);
@@ -74,31 +74,29 @@ void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t){
   }
   i++;
   
-  invchars = NULL;
-  if (expr[i] == '^') {
-    i++;
-    l = strlen(&expr[i]);
-    invchars = malloc(l+1);
-    strcpy(invchars, &expr[i]);
-  } 
+
+  if (expr[i] == '^') 
+    for(char *c = &expr[++i]; *c; c++)
+      invchars[(unsigned char)*c] = true;
 
   if (az) {
     for (i = 0; i < 26; i++)
-      if (!invchars || !strchr(invchars, i + 'a'))
+      if (!invchars['a'+i])
         dfa_add_delta(s, i + 'a', t);
   }
+
   if (AZ) {
     for (i = 0; i < 26; i++)
-      if (!invchars || !strchr(invchars, i + 'A'))
+      if (!invchars['a'+i])
         dfa_add_delta(s, i + 'A', t);
   }
+
   if (nums) {
     for (i = 0; i < 10; i++)
-      if (!invchars || !strchr(invchars, i + '0'))
+      if (!invchars['a'+i])
         dfa_add_delta(s, i + '0', t);
   }
 
-  free(invchars);
 }
 
 
@@ -112,14 +110,14 @@ bool dfa_node_move(DfaNode **node, char input) {
   return false;
 }
 
-void print_dfa_node(DfaNode *node) {
-  printf("%s %s |", node->name, (node->is_final) ? " (final) " : "         ");
+/* void print_dfa_node(DfaNode *node) { */
+/*   printf("%s %s |", node->name, (node->is_final) ? " (final) " : "         "); */
 
-  for (int i = 0; i < node->map.size; i++) {
-    printf(" '%c' : %s  |", node->map.key[i], node->map.val[i]->name);
-  }
-  printf("\n");
-}
+/*   for (int i = 0; i < node->map.size; i++) { */
+/*     printf(" '%c' : %s  |", node->map.key[i], node->map.val[i]->name); */
+/*   } */
+/*   printf("\n"); */
+/* } */
 
 bool dfa_valida_cadeia(DfaNode *estado_inicial, char *cadeia) {
   bool char_invalido = false;
