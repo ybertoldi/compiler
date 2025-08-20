@@ -36,6 +36,6 @@ void dfa_add_delta(DfaNode *node, char key, DfaNode *value);
 void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t);
 
 bool dfa_valida_cadeia(DfaNode *estado_inicial, char *cadeia);
-void print_dfa_node(DfaNode *node);
+//void print_dfa_node(DfaNode *node);
 bool dfa_node_move(DfaNode **node, char input);
 #endif

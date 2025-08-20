@@ -208,8 +208,7 @@ TokenList *tokenize(char *eval, DfaNode *start){
     if (curlist) {
       tklappend(curlist, tklalloc(strndup(&eval[tknstart], n), curnode->type));
     } else {
-      curlist =
-          tklalloc(strndup(&eval[tknstart], n), curnode->type);
+      curlist = tklalloc(strndup(&eval[tknstart], n), curnode->type);
       head = curlist;
     }
 
@@ -219,16 +218,16 @@ TokenList *tokenize(char *eval, DfaNode *start){
   return head;
 }
 
-void dfa_add_delta_orelse(DfaNode *src, char c, DfaNode *target, DfaNode *other){
+void dfa_add_delta_orelse(DfaNode *src, char c, DfaNode *target,
+                          DfaNode *other) {
   char otherexpr[16];
   dfa_add_delta(src, c, target);
   sprintf(otherexpr, "_[A-Za-z0-9]^%c", c);
   dfa_add_delta_expr(src, otherexpr, other);
 }
 
-
-int main(){
-/*-----------------------DEFINICAO DOS ESTADOS-----------------------*/
+int main() {
+  /*-----------------------DEFINICAO DOS ESTADOS-----------------------*/
   DfaNode q0 = BUILD_DFA_NODE(TKTYPE_INIT);
   DfaNode q1 = BUILD_DFA_NODE_FINAL(TKTYPE_WTSP);
 
@@ -240,7 +239,7 @@ int main(){
   DfaNode q7 = BUILD_DFA_NODE_FINAL(TKTYPE_CLSQRBRACK);
   DfaNode q8 = BUILD_DFA_NODE_FINAL(TKTYPE_COMMA);
   DfaNode q9 = BUILD_DFA_NODE_FINAL(TKTYPE_SMCOLON);
-  
+
   DfaNode q10 = BUILD_DFA_NODE_FINAL(TKTYPE_SUM);
   DfaNode q11 = BUILD_DFA_NODE_FINAL(TKTYPE_SUB);
   DfaNode q12 = BUILD_DFA_NODE_FINAL(TKTYPE_DIV);
@@ -262,83 +261,83 @@ int main(){
   DfaNode q26 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);
   DfaNode q27 = BUILD_DFA_NODE_FINAL(TKTYPE_ATTRIBUTION);
 
-  DfaNode q28 = BUILD_DFA_NODE_FINAL(TKTYPE_INT); //0 (pode comecar um octal o hexa)
+  DfaNode q28 =
+      BUILD_DFA_NODE_FINAL(TKTYPE_INT); // 0 (pode comecar um octal o hexa)
   DfaNode q29 = BUILD_DFA_NODE_FINAL(TKTYPE_INT);
   DfaNode q30 = BUILD_DFA_NODE_FINAL(TKTYPE_FLOAT);
   DfaNode q31 = BUILD_DFA_NODE_FINAL(TKTYPE_HEXINT);
   DfaNode q32 = BUILD_DFA_NODE_FINAL(TKTYPE_OCTALINT);
 
-  
-  DfaNode q33 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); //i
-  DfaNode q34 = BUILD_DFA_NODE_FINAL(TKTYPE_IF);  //if
+  DfaNode q33 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // i
+  DfaNode q34 = BUILD_DFA_NODE_FINAL(TKTYPE_IF);  // if
 
-  DfaNode q35 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //e
-  DfaNode q36 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //el
-  DfaNode q37 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //els
-  DfaNode q38 = BUILD_DFA_NODE_FINAL(TKTYPE_ELSE); //else
+  DfaNode q35 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // e
+  DfaNode q36 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // el
+  DfaNode q37 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // els
+  DfaNode q38 = BUILD_DFA_NODE_FINAL(TKTYPE_ELSE); // else
 
-  DfaNode q39 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //f
-  DfaNode q40 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //fo
-  DfaNode q41 = BUILD_DFA_NODE_FINAL(TKTYPE_FOR);  //for
+  DfaNode q39 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // f
+  DfaNode q40 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // fo
+  DfaNode q41 = BUILD_DFA_NODE_FINAL(TKTYPE_FOR); // for
 
-  DfaNode q42 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //w
-  DfaNode q43 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //wh
-  DfaNode q44 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //whi
-  DfaNode q45 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //whil
-  DfaNode q46 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  //while
+  DfaNode q42 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // w
+  DfaNode q43 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // wh
+  DfaNode q44 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // whi
+  DfaNode q45 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // whil
+  DfaNode q46 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR); // while
 
-  DfaNode q47 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //s
-  DfaNode q48 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //sw
-  DfaNode q49 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //swi
-  DfaNode q50 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //swit
-  DfaNode q51 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //switc
-  DfaNode q52 = BUILD_DFA_NODE_FINAL(TKTYPE_SWITCH);  //switch
+  DfaNode q47 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // s
+  DfaNode q48 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // sw
+  DfaNode q49 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // swi
+  DfaNode q50 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // swit
+  DfaNode q51 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // switc
+  DfaNode q52 = BUILD_DFA_NODE_FINAL(TKTYPE_SWITCH); // switch
 
-  DfaNode q53 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   //c
-  DfaNode q54 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   //ca
-  DfaNode q55 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   //cas
-  DfaNode q56 = BUILD_DFA_NODE_FINAL(TKTYPE_CASE);  //case
+  DfaNode q53 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // c
+  DfaNode q54 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // ca
+  DfaNode q55 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // cas
+  DfaNode q56 = BUILD_DFA_NODE_FINAL(TKTYPE_CASE); // case
 
-  DfaNode q57 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //fa (f do for)
-  DfaNode q58 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //fal
-  DfaNode q59 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //fals
-  DfaNode q60 = BUILD_DFA_NODE_FINAL(TKTYPE_FALSE);   //false
+  DfaNode q57 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // fa (f do for)
+  DfaNode q58 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // fal
+  DfaNode q59 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // fals
+  DfaNode q60 = BUILD_DFA_NODE_FINAL(TKTYPE_FALSE); // false
 
-  DfaNode q61 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //t
-  DfaNode q62 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //tr
-  DfaNode q63 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     //tru
-  DfaNode q64 = BUILD_DFA_NODE_FINAL(TKTYPE_TRUE);    //true
-  
-  DfaNode q65 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //i
-  DfaNode q66 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //in
-  DfaNode q67 = BUILD_DFA_NODE_FINAL(TKTYPE_T_INT);     //int
+  DfaNode q61 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // t
+  DfaNode q62 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // tr
+  DfaNode q63 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // tru
+  DfaNode q64 = BUILD_DFA_NODE_FINAL(TKTYPE_TRUE); // true
 
-  DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //c
-  DfaNode q69 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //ch
-  DfaNode q70 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //cha
-  DfaNode q71 = BUILD_DFA_NODE_FINAL(TKTYPE_T_CHAR);    //char
+  DfaNode q65 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // i
+  DfaNode q66 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // in
+  DfaNode q67 = BUILD_DFA_NODE_FINAL(TKTYPE_T_INT); // int
 
-  DfaNode q72 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //b
-  DfaNode q73 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //bo
-  DfaNode q74 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //boo
-  DfaNode q75 = BUILD_DFA_NODE_FINAL(TKTYPE_T_BOOL);    //bool
+  DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // c
+  DfaNode q69 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // ch
+  DfaNode q70 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // cha
+  DfaNode q71 = BUILD_DFA_NODE_FINAL(TKTYPE_T_CHAR); // char
 
-  DfaNode q76 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //l
-  DfaNode q77 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //lo
-  DfaNode q78 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //lon
-  DfaNode q79 = BUILD_DFA_NODE_FINAL(TKTYPE_T_LONG);    //long
+  DfaNode q72 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // b
+  DfaNode q73 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // bo
+  DfaNode q74 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // boo
+  DfaNode q75 = BUILD_DFA_NODE_FINAL(TKTYPE_T_BOOL); // bool
 
-  DfaNode q80 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //d
-  DfaNode q81 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //do
-  DfaNode q82 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //dou
-  DfaNode q83 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //doub
-  DfaNode q84 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //doubl
-  DfaNode q85 = BUILD_DFA_NODE_FINAL(TKTYPE_T_DOUBLE);  //double
+  DfaNode q76 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // l
+  DfaNode q77 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // lo
+  DfaNode q78 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // lon
+  DfaNode q79 = BUILD_DFA_NODE_FINAL(TKTYPE_T_LONG); // long
 
-  DfaNode q86 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //fl (f do for)
-  DfaNode q87 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //flo
-  DfaNode q88 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);       //floa
-  DfaNode q89 = BUILD_DFA_NODE_FINAL(TKTYPE_T_FLOAT);   //float
+  DfaNode q80 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);      // d
+  DfaNode q81 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);      // do
+  DfaNode q82 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);      // dou
+  DfaNode q83 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);      // doub
+  DfaNode q84 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);      // doubl
+  DfaNode q85 = BUILD_DFA_NODE_FINAL(TKTYPE_T_DOUBLE); // double
+
+  DfaNode q86 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // fl (f do for)
+  DfaNode q87 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // flo
+  DfaNode q88 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // floa
+  DfaNode q89 = BUILD_DFA_NODE_FINAL(TKTYPE_T_FLOAT); // float
 
   /*-----WTPS------*/
   dfa_add_delta_expr(&q0, " \t\n", &q1);
@@ -361,7 +360,7 @@ int main(){
   dfa_add_delta(&q0, '*', &q13);
   dfa_add_delta(&q0, '%', &q14);
 
-  //bitwise
+  // bitwise
   dfa_add_delta(&q0, '&', &q15);
   dfa_add_delta(&q0, '|', &q16);
   dfa_add_delta(&q22, '<', &q17);
@@ -378,22 +377,23 @@ int main(){
 
   dfa_add_delta(&q16, '|', &q24);
   dfa_add_delta(&q15, '&', &q25);
-  
+
   /*-----VARIAVEIS------*/
-  dfa_add_delta_expr(&q0, "_[A-Za-z]^iefwsc", &q26); 
+  dfa_add_delta_expr(&q0, "_[A-Za-z]^iefwsc", &q26);
   dfa_add_delta_expr(&q26, "_[A-Za-z]", &q26);
 
-  dfa_add_delta(&q0, '=', &q27); //atribuicao
+  dfa_add_delta(&q0, '=', &q27); // atribuicao
   /*-----NUMEROS------*/
-  //int comum
+  // int comum
   dfa_add_delta_expr(&q0, "[0-9]^0", &q29);
   dfa_add_delta_expr(&q29, "[0-9]", &q29);
 
-  //float
+  // float
   dfa_add_delta(&q29, '.', &q30);
   dfa_add_delta_expr(&q30, "[0-9]", &q30);
 
-  //ou int em hexa/octal. ou float so com casas decimais. ou simplesmente o numero 0
+  // ou int em hexa/octal. ou float so com casas decimais. ou simplesmente o
+  // numero 0
   dfa_add_delta(&q0, '0', &q28);
   dfa_add_delta_expr(&q28, "[0-9]", &q32);
   dfa_add_delta_expr(&q32, "[0-9]", &q32);
@@ -404,17 +404,19 @@ int main(){
   dfa_add_delta(&q28, '.', &q30);
 
   /*----------------------PALAVRAS RESERVADAS-----------------------*/
+  // if
   dfa_add_delta(&q0, 'i', &q33);
   dfa_add_delta_orelse(&q33, 'f', &q34, &q26);
   dfa_add_delta_expr(&q34, "_[A-Za-z0-9]", &q26);
 
-
+  // else
   dfa_add_delta(&q0, 'e', &q35);
   dfa_add_delta_orelse(&q35, 'l', &q36, &q26);
   dfa_add_delta_orelse(&q36, 's', &q37, &q26);
   dfa_add_delta_orelse(&q37, 'e', &q38, &q26);
   dfa_add_delta_expr(&q38, "_[A-Za-z0-9]", &q26);
 
+  // for
   dfa_add_delta(&q0, 'f', &q39);
   dfa_add_delta(&q39, 'o', &q40);
   dfa_add_delta_expr(&q39, "_[A-Za-z0-9]^oal", &q26); // for, false e float
@@ -422,6 +424,7 @@ int main(){
   dfa_add_delta_orelse(&q40, 'r', &q41, &q26);
   dfa_add_delta_expr(&q41, "_[A-Za-z0-9]", &q26);
 
+  // while
   dfa_add_delta(&q0, 'w', &q42);
   dfa_add_delta_orelse(&q42, 'h', &q43, &q26);
   dfa_add_delta_orelse(&q43, 'i', &q44, &q26);
@@ -429,6 +432,7 @@ int main(){
   dfa_add_delta_orelse(&q45, 'e', &q46, &q26);
   dfa_add_delta_expr(&q46, "_[A-Za-z0-9]", &q26);
 
+  // switch
   dfa_add_delta(&q0, 's', &q47);
   dfa_add_delta_orelse(&q47, 'w', &q48, &q26);
   dfa_add_delta_orelse(&q48, 'i', &q49, &q26);
@@ -437,6 +441,7 @@ int main(){
   dfa_add_delta_orelse(&q51, 'h', &q52, &q26);
   dfa_add_delta_expr(&q52, "_[A-Za-z0-9]", &q26);
 
+  // case
   dfa_add_delta(&q0, 'c', &q53);
   dfa_add_delta_orelse(&q53, 'a', &q54, &q26);
   dfa_add_delta_orelse(&q54, 's', &q55, &q26);
@@ -450,21 +455,78 @@ int main(){
   dfa_add_delta_orelse(&q59, 'e', &q60, &q26);
   dfa_add_delta_expr(&q60, "_[A-Za-z0-9]", &q26);
 
-/*--------------------------ANALISE LEXICA------------------------------*/
-  char *eval = "if (cont > 10) { +-/% & >> <<  > >= < <= == && || \n\t\tsou_uma_variavel=0x23fab - 0432;} meufloat=4.5;";
+  // true
+  dfa_add_delta(&q0, 't', &q61);
+  dfa_add_delta_orelse(&q62, 'r', &q63, &q26);
+  dfa_add_delta_orelse(&q63, 'u', &q64, &q26);
+  dfa_add_delta_orelse(&q64, 'e', &q65, &q26);
+  dfa_add_delta_expr(&q65, "_[A-Za-z0-9]", &q26);
+
+  // int
+  dfa_add_delta(&q0, 'i', &q65);
+  dfa_add_delta_orelse(&q65, 'n', &q66, &q26);
+  dfa_add_delta_orelse(&q66, 't', &q67, &q26);
+  dfa_add_delta_expr(&q67, "_[A-Za-z0-9]", &q26);
+
+  // char
+  dfa_add_delta(&q0, 'c', &q68);
+  dfa_add_delta_orelse(&q68, 'h', &q69, &q26);
+  dfa_add_delta_orelse(&q69, 'a', &q70, &q26);
+  dfa_add_delta_orelse(&q70, 'r', &q71, &q26);
+  dfa_add_delta_expr(&q71, "_[A-Za-z0-9]", &q26);
+
+  // bool
+  dfa_add_delta(&q0, 'b', &q72);
+  dfa_add_delta_orelse(&q72, 'o', &q73, &q26);
+  dfa_add_delta_orelse(&q73, 'o', &q74, &q26);
+  dfa_add_delta_orelse(&q74, 'l', &q75, &q26);
+  dfa_add_delta_expr(&q75, "_[A-Za-z0-9]", &q26);
+
+  // long
+  dfa_add_delta(&q0, 'l', &q76);
+  dfa_add_delta_orelse(&q76, 'o', &q77, &q26);
+  dfa_add_delta_orelse(&q77, 'n', &q78, &q26);
+  dfa_add_delta_orelse(&q78, 'g', &q79, &q26);
+  dfa_add_delta_expr(&q79, "_[A-Za-z0-9]", &q26);
+
+  // double
+  dfa_add_delta(&q0, 'd', &q80);
+  dfa_add_delta_orelse(&q80, 'o', &q81, &q26);
+  dfa_add_delta_orelse(&q81, 'u', &q82, &q26);
+  dfa_add_delta_orelse(&q82, 'b', &q83, &q26);
+  dfa_add_delta_orelse(&q83, 'l', &q84, &q26);
+  dfa_add_delta_orelse(&q84, 'e', &q85, &q26);
+  dfa_add_delta_expr(&q85, "_[A-Za-z0-9]", &q26);
+
+  // float
+  dfa_add_delta(&q39, 'l', &q86);
+  dfa_add_delta_orelse(&q86, 'o', &q87, &q26);
+  dfa_add_delta_orelse(&q87, 'a', &q88, &q26);
+  dfa_add_delta_orelse(&q88, 't', &q89, &q26);
+  dfa_add_delta_expr(&q89, "_[A-Za-z0-9]", &q26);
+
+  /*--------------------------ANALISE LEXICA------------------------------*/
+  char *eval = "\nif (cont > 10) {\n" 
+               "\t+-/% & >> <<  > >= < <= == && ||\n"
+               "\tint uma_variavel=0x23fab - 0432;\n"
+               "}\n\n"
+               "double umdouble=4.5;\n"
+               "long x,y;\n"
+               "float z;\n"
+               "x=2; y=5; z = 1.0*x/y;\n"
+               "for (int i = 0; i<10; i+= 1)\n"
+               "\tx |= 0x1 << i;";
   TokenList *tkns = tokenize(eval, &q0);
   TokenList *curlist = tkns;
-  for (; curlist; curlist = curlist->next){
-    printf("TOKEN(lexeme=\"%s\", type=%s)\n", curlist->lexeme, print_type(curlist->type));
+  for (; curlist; curlist = curlist->next) {
+    if (curlist->type == TKTYPE_WTSP) continue;
+    printf("TOKEN(lexeme=\"%s\", type=%s)\n", curlist->lexeme,
+           print_type(curlist->type));
   }
-  printf("texto original: \"%s\"\n", eval);
+  printf("\n\ntexto original: \n%s\n", eval);
 
-/*------------------------ANALISE SINTATICA----------------------------*/
-  //TODO...
+  /*------------------------ANALISE SINTATICA----------------------------*/
+  // TODO...
 
   return 0;
 }
-
-
-
-
