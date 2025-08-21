@@ -80,99 +80,99 @@ typedef struct tk{
 char *print_type(TKTYPE t) {
   switch (t) {
   case TKTYPE_INIT:
-    return "TKTYPE_INIT";
+    return "INIT";
   case TKTYPE_WTSP:
-    return "TKTYPE_WTSP";
+    return "WTSP";
   case TKTYPE_OPPAREN:
-    return "TKTYPE_OPPAREN";
+    return "OPPAREN";
   case TKTYPE_CLPAREN:
-    return "TKTYPE_CLPAREN";
+    return "CLPAREN";
   case TKTYPE_OPBRACKET:
-    return "TKTYPE_OPBRACKET";
+    return "OPBRACKET";
   case TKTYPE_CLBRACKET:
-    return "TKTYPE_CLBRACKET";
+    return "CLBRACKET";
   case TKTYPE_OPSQRBRACK:
-    return "TKTYPE_OPSQRBRACK";
+    return "OPSQRBRACK";
   case TKTYPE_CLSQRBRACK:
-    return "TKTYPE_CLSQRBRACK";
+    return "CLSQRBRACK";
   case TKTYPE_COMMA:
-    return "TKTYPE_COMMA";
+    return "COMMA";
   case TKTYPE_SMCOLON:
-    return "TKTYPE_SMCOLON";
+    return "SMCOLON";
   case TKTYPE_SUM:
-    return "TKTYPE_SUM";
+    return "SUM";
   case TKTYPE_SUB:
-    return "TKTYPE_SUB";
+    return "SUB";
   case TKTYPE_DIV:
-    return "TKTYPE_DIV";
+    return "DIV";
   case TKTYPE_MULT:
-    return "TKTYPE_MULT";
+    return "MULT";
   case TKTYPE_MOD:
-    return "TKTYPE_MOD";
+    return "MOD";
   case TKTYPE_BITWISE_AND:
-    return "TKTYPE_BITWISE_AND";
+    return "BITWISE_AND";
   case TKTYPE_BITWISE_OR:
-    return "TKTYPE_BITWISE_OR";
+    return "BITWISE_OR";
   case TKTYPE_BITWISE_SHFTL:
-    return "TKTYPE_BITWISE_SHFTL";
+    return "BITWISE_SHFTL";
   case TKTYPE_BITWISE_SHFTR:
-    return "TKTYPE_BITWISE_SHFTR";
+    return "BITWISE_SHFTR";
   case TKTYPE_EQUALS:
-    return "TKTYPE_EQUALS";
+    return "EQUALS";
   case TKTYPE_GT:
-    return "TKTYPE_GT";
+    return "GT";
   case TKTYPE_GEQT:
-    return "TKTYPE_GEQT";
+    return "GEQT";
   case TKTYPE_LT:
-    return "TKTYPE_LT";
+    return "LT";
   case TKTYPE_LEQT:
-    return "TKTYPE_LEQT";
+    return "LEQT";
   case TKTYPE_LOGIC_OR:
-    return "TKTYPE_LOGIC_OR";
+    return "LOGIC_OR";
   case TKTYPE_LOGIC_AND:
-    return "TKTYPE_LOGIC_AND";
+    return "LOGIC_AND";
   case TKTYPE_NEGATION:
-    return "TKTYPE_NEGATION";
+    return "NEGATION";
   case TKTYPE_VAR:
-    return "TKTYPE_VAR";
+    return "VAR";
   case TKTYPE_ATTRIBUTION:
-    return "TKTYPE_ATTRIBUTION";
+    return "ATTRIBUTION";
   case TKTYPE_INT:
-    return "TKTYPE_INT";
+    return "INT";
   case TKTYPE_FLOAT:
-    return "TKTYPE_FLOAT";
+    return "FLOAT";
   case TKTYPE_HEXINT:
-    return "TKTYPE_HEXINT";
+    return "HEXINT";
   case TKTYPE_OCTALINT:
-    return "TKTYPE_OCTALINT";
+    return "OCTALINT";
   case TKTYPE_IF:
-    return "TKTYPE_IF";
+    return "IF";
   case TKTYPE_ELSE:
-    return "TKTYPE_ELSE";
+    return "ELSE";
   case TKTYPE_FOR:
-    return "TKTYPE_FOR";
+    return "FOR";
   case TKTYPE_WHILE:
-    return "TKTYPE_WHILE";
+    return "WHILE";
   case TKTYPE_SWITCH:
-    return "TKTYPE_SWITCH";
+    return "SWITCH";
   case TKTYPE_CASE:
-    return "TKTYPE_CASE";
+    return "CASE";
   case TKTYPE_FALSE:
-    return "TKTYPE_FALSE";
+    return "FALSE";
   case TKTYPE_TRUE:
-    return "TKTYPE_TRUE";
+    return "TRUE";
   case TKTYPE_T_INT:
-    return "TKTYPE_T_INT";
+    return "T_INT";
   case TKTYPE_T_CHAR:
-    return "TKTYPE_T_CHAR";
+    return "T_CHAR";
   case TKTYPE_T_BOOL:
-    return "TKTYPE_T_BOOL";
+    return "T_BOOL";
   case TKTYPE_T_LONG:
-    return "TKTYPE_T_LONG";
+    return "T_LONG";
   case TKTYPE_T_DOUBLE:
-    return "TKTYPE_T_DOUBLE";
+    return "T_DOUBLE";
   case TKTYPE_T_FLOAT:
-    return "TKTYPE_T_FLOAT";
+    return "T_FLOAT";
   }
 }
 
@@ -522,8 +522,10 @@ int main() {
   TokenList *curlist = tkns;
   for (; curlist; curlist = curlist->next) {
     if (curlist->type == TKTYPE_WTSP) continue;
-    printf("TOKEN(lexeme=\"%s\", type=%s)\n", curlist->lexeme,
-           print_type(curlist->type));
+    printf("TOKEN(\"%s\", %s)%s\n", 
+           curlist->lexeme,
+           print_type(curlist->type),
+           curlist->next ? "," : "");
   }
   printf("\n\ntexto original: \n%s\n", eval);
 
