@@ -308,7 +308,9 @@ int main() {
   DfaNode q63 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // tru
   DfaNode q64 = BUILD_DFA_NODE_FINAL(TKTYPE_TRUE); // true
 
-  DfaNode q65 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // i
+  /* TODO: mudar os indiceds
+   * DfaNode q65 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);
+  */
   DfaNode q66 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // in
   DfaNode q67 = BUILD_DFA_NODE_FINAL(TKTYPE_T_INT); // int
 
@@ -379,7 +381,7 @@ int main() {
   dfa_add_delta(&q15, '&', &q25);
 
   /*-----VARIAVEIS------*/
-  dfa_add_delta_expr(&q0, "_[A-Za-z]^iefwsc", &q26);
+  dfa_add_delta_expr(&q0, "_[A-Za-z]^iefwsctlbd", &q26);
   dfa_add_delta_expr(&q26, "_[A-Za-z]", &q26);
 
   dfa_add_delta(&q0, '=', &q27); // atribuicao
@@ -406,7 +408,8 @@ int main() {
   /*----------------------PALAVRAS RESERVADAS-----------------------*/
   // if
   dfa_add_delta(&q0, 'i', &q33);
-  dfa_add_delta_orelse(&q33, 'f', &q34, &q26);
+  dfa_add_delta(&q33, 'f', &q34);
+  dfa_add_delta_expr(&q33, "_[A-Za-z0-9]^n", &q26);
   dfa_add_delta_expr(&q34, "_[A-Za-z0-9]", &q26);
 
   // else
@@ -457,14 +460,13 @@ int main() {
 
   // true
   dfa_add_delta(&q0, 't', &q61);
-  dfa_add_delta_orelse(&q62, 'r', &q63, &q26);
-  dfa_add_delta_orelse(&q63, 'u', &q64, &q26);
-  dfa_add_delta_orelse(&q64, 'e', &q65, &q26);
-  dfa_add_delta_expr(&q65, "_[A-Za-z0-9]", &q26);
+  dfa_add_delta_orelse(&q61, 'r', &q62, &q26);
+  dfa_add_delta_orelse(&q62, 'u', &q63, &q26);
+  dfa_add_delta_orelse(&q63, 'e', &q64, &q26);
+  dfa_add_delta_expr(&q64, "_[A-Za-z0-9]", &q26);
 
   // int
-  dfa_add_delta(&q0, 'i', &q65);
-  dfa_add_delta_orelse(&q65, 'n', &q66, &q26);
+  dfa_add_delta(&q33, 'n', &q66); //i do if
   dfa_add_delta_orelse(&q66, 't', &q67, &q26);
   dfa_add_delta_expr(&q67, "_[A-Za-z0-9]", &q26);
 
