@@ -313,8 +313,10 @@ static void tklappend(TokenList *head, TokenList *val){
 }
 
 TokenList *tokenize(char *eval){
-  if (!initialized)
+  if (!initialized){
     init_dfa();
+    initialized = 1;
+  }
 
   int i = 0;
   TokenList *curlist = NULL, *head;
