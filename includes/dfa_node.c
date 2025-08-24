@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +41,9 @@ void dfa_add_delta(DfaNode *node, char key, DfaNode *value) {
  * exemplos de expressoes:
  * "[A-Z]", "[A-Za-z]", "[A-Z]^JKL", "-*+/", "-[0-9]"
  */
-void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t){
-  int i, to_addlen, l;
+void dfa_add_delta_expr(DfaNode *s, char *expr, DfaNode *t){
+  int i;
+  size_t to_addlen;
   char invchars[256] = {0};
   bool az, AZ, nums;
 

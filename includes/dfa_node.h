@@ -6,14 +6,11 @@
 #define DFAUTOMATA_H
 #define MAX_MAP_SIZE 256
 
+#define BUILD_DFA_NODE(n_type)                                                 \
+  {.type = n_type, .map = {{0}}, .is_final = false}
 
-#define BUILD_DFA_NODE(s_name)                                                 \
-  {.type = s_name, .map = init_dfa_map(), .is_final = false}
-
-#define BUILD_DFA_NODE_FINAL(s_name)                                           \
-  {.type = s_name, .map = init_dfa_map(), .is_final = true}
-
-
+#define BUILD_DFA_NODE_FINAL(n_type)                                           \
+  {.type = n_type, .map = {{0}}, .is_final = true}
 
 typedef struct dfa_node_map {
   char key[MAX_MAP_SIZE];
@@ -33,7 +30,7 @@ DfaNode *dfa_map_get(DfaMap *map, char key);
 DfaNode *dfalloc(char *name, bool isfinal);
 
 void dfa_add_delta(DfaNode *node, char key, DfaNode *value);
-void dfa_add_delta_expr(DfaNode *s, const char *expr, DfaNode *t);
+void dfa_add_delta_expr(DfaNode *s, char *expr, DfaNode *t);
 
 bool dfa_valida_cadeia(DfaNode *estado_inicial, char *cadeia);
 //void print_dfa_node(DfaNode *node);
