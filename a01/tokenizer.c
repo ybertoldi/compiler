@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "tokenizer.h"
+
 /*-----------------------DEFINICAO DOS ESTADOS-----------------------*/
 static DfaNode q0 = BUILD_DFA_NODE(TKTYPE_INIT);
 static DfaNode q1 = BUILD_DFA_NODE_FINAL(TKTYPE_WTSP);
@@ -84,11 +85,11 @@ static DfaNode q62 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // tr
 static DfaNode q63 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);  // tru
 static DfaNode q64 = BUILD_DFA_NODE_FINAL(TKTYPE_TRUE); // true
 
-// TODO: mudar os indiceds
+// TODO: mudar os indices
 static DfaNode q66 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // in (i do if)
 static DfaNode q67 = BUILD_DFA_NODE_FINAL(TKTYPE_T_INT); // int
 
-static DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // c
+static DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // c //TODO: tirar esse estado (c do case)
 static DfaNode q69 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // ch
 static DfaNode q70 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // cha
 static DfaNode q71 = BUILD_DFA_NODE_FINAL(TKTYPE_T_CHAR); // char
@@ -117,7 +118,7 @@ static DfaNode q89 = BUILD_DFA_NODE_FINAL(TKTYPE_T_FLOAT); // float
 
 static int initialized = 0;
 
-
+// utilitario para inicializar os estados
 static void dfa_add_delta_orelse(DfaNode *src, char c, DfaNode *target, DfaNode *other) {
   char otherexpr[16];
   dfa_add_delta(src, c, target);
@@ -291,7 +292,6 @@ static void init_dfa(void){
   dfa_add_delta_orelse(&q87, 'a', &q88, &q26);
   dfa_add_delta_orelse(&q88, 't', &q89, &q26);
   dfa_add_delta_expr(&q89, "_[A-Za-z0-9]", &q26);
-
 }
 
 
@@ -328,6 +328,13 @@ TokenList *tokenize(char *eval){
       i++;
       n++;
     }
+    
+    if (!curnode->is_final){
+      fprintf(stderr, "ERRO: caracter nao tratado '%c' em %d\n", eval[i], i);
+      exit(1);
+    }
+
+
     if (curlist) {
       tklappend(curlist, tklalloc(strndup(&eval[tknstart], n), curnode->type));
     } else {
@@ -443,7 +450,7 @@ char *type2str(TKTYPE t) {
   //TODO: adicionar caracteres de escape 
   default:
     fprintf(stderr, "ERRO: token nao especificado");
-    exit(0);
+    exit(1);
   }
 }
 
