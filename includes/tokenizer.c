@@ -334,12 +334,14 @@ TokenList *tokenize(char *eval){
       exit(1);
     }
 
-
-    if (curlist) {
-      tklappend(curlist, tklalloc(strndup(&eval[tknstart], n), curnode->type));
-    } else {
-      curlist = tklalloc(strndup(&eval[tknstart], n), curnode->type);
-      head = curlist;
+    if (curnode->type != TKTYPE_WTSP) {
+      if (curlist) {
+        tklappend(curlist,
+                  tklalloc(strndup(&eval[tknstart], n), curnode->type));
+      } else {
+        curlist = tklalloc(strndup(&eval[tknstart], n), curnode->type);
+        head = curlist;
+      }
     }
     curnode = &q0;
   }
