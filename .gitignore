@@ -1,2 +1,6 @@
-*.py
 *.un
+*.un~
+exemplo*
+teste*
+gals.jar
+__*
