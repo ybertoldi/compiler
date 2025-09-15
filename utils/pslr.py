@@ -1,5 +1,6 @@
 from rich import print as pp
 from rich.rule import Rule
+from copy import deepcopy
 
 bnf= """
 <DEC>   ::= <TIPO> id  eq <EXPR> pv;
@@ -14,7 +15,7 @@ bnf= """
 cmd1 = ["tipo", "id", "eq", "const", "pv"]; # int numero = 50;
 cmd2 = ["if", "ap", "id", "gt", "const", "fp"] # if (numero > 10)
 bnf_dict = {}
-terminais = []
+terminais = set()
 for ln in bnf.split('\n'):
     if not ln.strip(): 
         continue
@@ -24,7 +25,9 @@ for ln in bnf.split('\n'):
             [s1.strip() for s1 in s.split() if s1] 
             for s in prod.split('|')
     ]
-    terminais = []
+    terminais |= set(term for prod in bnf_dict[c] for term in prod if not term.startswith('<'))
+
+terminais = list(terminais)
 
 _ffirstcache = {}
 def find_first(bnf_dict: dict[str,list[list[str]]], target:str) -> list[str]:
@@ -78,13 +81,21 @@ for key in bnf_dict:
     follows[key] = list(find_follow(bnf_dict, firsts, key))
 
 
+colunas = dict(zip(terminais,[set()] * len(terminais)))
+M = dict((k, deepcopy(colunas)) for k in bnf_dict)
 
-M = dict((k, {}) for k in bnf_dict)
+for var, prods in bnf_dict.items():
+    for prod in prods:
+        nonterms = [v for v in prod if v.startswith('<')]
+        for nonterm in nonterms:
+            for f in firsts[nonterm]:
+                M[var][f].update(prod)
+
+
 
 pp(Rule('dicionario bnf'), bnf_dict)
 pp(Rule('firsts'),firsts)
 pp(Rule("follows"),follows)
-
-
+pp(Rule("tabela M"),M)
 
 
