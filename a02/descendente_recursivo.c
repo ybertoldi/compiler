@@ -104,9 +104,6 @@ bool term_op(TokenList **tkn){
  * ATR -> id atr EXP pv | tipo id atr EXP pv
  * DEC -> tipo id pv
  *
- *
- * inicial: 
- *    EXP -> id | const | id op EXP | const op EXP
  */
 
 

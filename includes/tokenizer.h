@@ -6,6 +6,7 @@
 typedef  enum {
   TKTYPE_INIT = 0,
   TKTYPE_WTSP,
+
   //SEPARADORES
   TKTYPE_OPPAREN,
   TKTYPE_CLPAREN,
@@ -17,16 +18,18 @@ typedef  enum {
   TKTYPE_SMCOLON,
   TKTYPE_SINGLE_QUOTE,
   TKTYPE_DOUBLE_QUOTE,
+
   //OPERADORES ARITIMETICOS
   TKTYPE_SUM,
   TKTYPE_SUB,
   TKTYPE_DIV,
   TKTYPE_MULT, // mesmo token para derefenciar um ponteiro
   TKTYPE_MOD,
-  TKTYPE_BITWISE_AND, // mesmo token para pegar o endereco de memoria de uma variavel
+  TKTYPE_BITWISE_AND, // mesmo token para pegar o endereco de memoria de uma variavel (&)
   TKTYPE_BITWISE_OR,
   TKTYPE_BITWISE_SHFTL,
   TKTYPE_BITWISE_SHFTR,
+
   //OPERADORES LOGICOS
   TKTYPE_EQUALS,
   TKTYPE_GT,
@@ -36,7 +39,7 @@ typedef  enum {
   TKTYPE_LOGIC_OR,
   TKTYPE_LOGIC_AND,
   TKTYPE_NEGATION, //negacao em bitwise e negacao logica sao iguais
-                   //
+                   
   //VARIAVEIS E NUMS
   TKTYPE_VAR,
   TKTYPE_ATTRIBUTION,
@@ -44,6 +47,7 @@ typedef  enum {
   TKTYPE_FLOAT,
   TKTYPE_HEXINT,
   TKTYPE_OCTALINT,
+
   //PALAVRAS RESERVADAS
   TKTYPE_IF,
   TKTYPE_ELSE,
@@ -53,6 +57,7 @@ typedef  enum {
   TKTYPE_CASE,
   TKTYPE_FALSE,
   TKTYPE_TRUE,
+
   //PALAVRAS RESERVADAS, TIPOS
   TKTYPE_T_INT,
   TKTYPE_T_CHAR,

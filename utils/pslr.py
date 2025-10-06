@@ -17,6 +17,17 @@ from copy import deepcopy
 # cmd1 = ["tipo", "id", "eq", "const", "pv"]; # int numero = 50;
 # cmd2 = ["if", "ap", "id", "gt", "const", "fp"] # if (numero > 10)
 
+# bnf = """
+# <DEC>   ::= <TIPO> id  eq <EXPR> pv;
+# <EXPR>  ::= <EXPR>  maiorq <EXPR1>  | <EXPR1>;
+# <EXPR1> ::= <EXPR1> menorq <EXPR2>  | <EXPR2>;
+# <EXPR2> ::= <EXPR2> mais   <EXPR3>  | <EXPR3>;
+# <EXPR3> ::= <EXPR3> menos  <EXPR4>  | <EXPR4>;
+# <EXPR4> ::= <EXPR4> vezes  <EXPR5>  | <EXPR5>;
+# <EXPR5> ::= id  | const | ap <EXPR> fp;
+# <TIPO>  ::= int | char | bool;
+# """
+
 bnf = """
 <E>   ::= <T> <E'>;
 <E'>  ::= mais <T> <E'> | epilson;
@@ -138,6 +149,8 @@ for A, prods_A in bnf_dict.items():
 for col in M.values():
     if 'epilson' in col:
         col.pop('epilson')
+
+pp(Rule("gramatica"), bnf)
 pp(Rule('tabela M'), M)
 
 

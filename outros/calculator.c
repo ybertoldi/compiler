@@ -1,4 +1,5 @@
-#include "common.h"
+#include "../includes/common.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,9 +98,8 @@ int factor() {
     return ret;
   } else {
     char *c = cur_sv.start;
-    int i = 0;
 
-    for (; i < cur_sv.size; i++) {
+    for (int i = 0; i < cur_sv.size; i++) {
       if (!isdigit(c[i])) {
         fprintf(stderr, "syntax error\n");
         exit(1);
