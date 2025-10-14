@@ -1,5 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
+from os.path import isfile
+import sys
 # import graphviz #-- descomente se quiser gerar a imagem do automato
 
 
@@ -62,23 +64,14 @@ class Node:
     def __eq__(self, other) -> bool:
         return isinstance(other, Node) and set(self.items) == set(other.items)
 
-# bnf = """
-# <DEC>   ::= <TIPO> id  eq <EXPR> pv
-# <EXPR>  ::= <EXPR>  maiorq <EXPR1>  | <EXPR1>
-# <EXPR1> ::= <EXPR1> menorq <EXPR2>  | <EXPR2>
-# <EXPR2> ::= <EXPR2> mais   <EXPR3>  | <EXPR3>
-# <EXPR3> ::= <EXPR3> menos  <EXPR4>  | <EXPR4>
-# <EXPR4> ::= <EXPR4> vezes  <EXPR5>  | <EXPR5>
-# <EXPR5> ::= id  | const | ap <EXPR> fp
-# <TIPO>  ::= int | char | bool
-# """
-
-bnf = """
-<E'>  ::= <E>
-<E>   ::= <E> TKTYPE_PLUS <T> | <T>
-<T>   ::= <T> TKTYPE_MULT <F> | <F>
-<F>   ::= TKTYPE_OPPAREN <E> TKTYPE_CLPAREN | TKTYPE_INT
-"""
+if (len(sys.argv) < 2):
+    print(f"usage: {sys.argv[0]} <bnf-file>")
+    exit(1)
+if not isfile(sys.argv[1]):
+    print(f"usage: {sys.argv[0]} <bnf-file>. Could not identify file '{sys.argv[1]}'")
+    exit(1)
+with open(sys.argv[1], 'r') as f:
+    bnf = f.read()
 
 variables_cache: dict[str, Variable] = {}
 variables: list[Variable] = []
@@ -216,7 +209,7 @@ while to_visit:
 print(
 """
 typedef struct {
-  long target
+  long target;
   long elements[256];
   long num_elems;
 } Production;
@@ -237,7 +230,7 @@ print("\t" + ",\n\t".join(enumlines))
 print("} VARTYPE;\n")
 
 # tabela goto
-print(f"long goto[{len(nodes)+1}][VAR_NUM_VARS] = {{")
+print(f"long goto_table[{len(nodes)+1}][VAR_NUM_VARS] = {{")
 for i, node in enumerate(nodes):
     p = []
     for entry, dest in node.goto.items():
