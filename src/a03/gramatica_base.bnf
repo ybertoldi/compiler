@@ -1,0 +1,8 @@
+<DEC>   ::= <TIPO> id  eq <EXPR> pv
+<EXPR>  ::= <EXPR>  maiorq <EXPR1>  | <EXPR1>
+<EXPR1> ::= <EXPR1> menorq <EXPR2>  | <EXPR2>
+<EXPR2> ::= <EXPR2> mais   <EXPR3>  | <EXPR3>
+<EXPR3> ::= <EXPR3> menos  <EXPR4>  | <EXPR4>
+<EXPR4> ::= <EXPR4> vezes  <EXPR5>  | <EXPR5>
+<EXPR5> ::= id  | const | ap <EXPR> fp
+<TIPO>  ::= int | char | bool
