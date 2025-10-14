@@ -1,7 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
-from rich import print as pprint
-# import graphviz -- descomente se quiser gerar a imagem do automato
+# import graphviz #-- descomente se quiser gerar a imagem do automato
 
 
 @dataclass
@@ -63,15 +62,23 @@ class Node:
     def __eq__(self, other) -> bool:
         return isinstance(other, Node) and set(self.items) == set(other.items)
 
-
+# bnf = """
+# <DEC>   ::= <TIPO> id  eq <EXPR> pv
+# <EXPR>  ::= <EXPR>  maiorq <EXPR1>  | <EXPR1>
+# <EXPR1> ::= <EXPR1> menorq <EXPR2>  | <EXPR2>
+# <EXPR2> ::= <EXPR2> mais   <EXPR3>  | <EXPR3>
+# <EXPR3> ::= <EXPR3> menos  <EXPR4>  | <EXPR4>
+# <EXPR4> ::= <EXPR4> vezes  <EXPR5>  | <EXPR5>
+# <EXPR5> ::= id  | const | ap <EXPR> fp
+# <TIPO>  ::= int | char | bool
+# """
 
 bnf = """
 <E'>  ::= <E>
-<E>   ::= <E> + <T> | <T>
-<T>   ::= <T> * <F> | <F>
-<F>   ::= ap <E> fp | id
+<E>   ::= <E> TKTYPE_PLUS <T> | <T>
+<T>   ::= <T> TKTYPE_MULT <F> | <F>
+<F>   ::= TKTYPE_OPPAREN <E> TKTYPE_CLPAREN | TKTYPE_INT
 """
-
 
 variables_cache: dict[str, Variable] = {}
 variables: list[Variable] = []
@@ -139,7 +146,6 @@ def goto(items: list[Item], symbol: str | Variable) -> None | Node:
     if key in _goto_cache:
         return _goto_cache[key]
 
-    print(items)
 
     kernels: list[Item] = []
     for item in items:
@@ -160,11 +166,13 @@ def goto(items: list[Item], symbol: str | Variable) -> None | Node:
 
 initial = Item(variables[0].prods[0])
 C = closure([initial]) #closure inicial: E' -> ·E
-to_visit = [C]
+to_visit: list[Node] = [C]
 visited = [C] 
+nodes: list[Node] = []
 
 while to_visit:
     cur_c = to_visit.pop(0)
+    nodes.append(cur_c)
     temp_items = defaultdict(list)
     for s in grammar_symbols:
         if (gt := goto(cur_c.items, s)) and gt not in cur_c.goto.values():
@@ -173,7 +181,7 @@ while to_visit:
                 to_visit.append(gt)
                 visited.append(gt)
         
-# -- descomente para gerar a imagem do automato
+## -- descomente para gerar a imagem do automato
 # pprint(C)
 # def draw_lr_automaton(start: Node, filename="automaton"):
 #     dot = graphviz.Digraph(format="png")
@@ -202,3 +210,56 @@ while to_visit:
 #     dot.render(filename, view=True)
 # 
 # draw_lr_automaton(C)
+
+
+# struct para as derivacoes
+print(
+"""
+typedef struct {
+  long target
+  long elements[256];
+  long num_elems;
+} Production;
+#define PROD(tgt, ...) (Production) \\
+        {.target = tgt, .elements = {__VA_ARGS__}, .num_elems = (sizeof((long[]){__VA_ARGS__})/sizeof(long))}
+""")
+
+# enum com as variaveis da gramatica
+enumlines = []
+print("typedef enum {")
+for i, var in enumerate(variables):
+    enumlines.append(
+            f"VAR_{var.head.replace('\'', '_')}" 
+            + (" = TKTYPE_NUM_TOKENS" if i == 0 else "")
+    )
+enumlines.append("VAR_NUM_VARS")
+print("\t" + ",\n\t".join(enumlines))
+print("} VARTYPE;\n")
+
+# tabela goto
+print(f"long goto[{len(nodes)+1}][VAR_NUM_VARS] = {{")
+for i, node in enumerate(nodes):
+    p = []
+    for entry, dest in node.goto.items():
+        entry_str = entry if isinstance(entry, str)\
+                else f"VAR_{entry.head.replace('\'', '_')}"
+        p.append(f"[{entry_str}] = {nodes.index(dest) + 1}")
+    print(f"\t[{i+1}] = {{ {', '.join(p)} }},")
+print("};\n")
+
+# tabela das producoes
+print(f"Production reduce[{len(nodes)+1}] = {{")
+for i, node in enumerate(nodes):
+    p = []
+    kernel = node.items[0]
+    if kernel.pos + 1 == len(kernel.prod.production):
+        fmt_head = "VAR_" + kernel.prod.head.replace('\'', '_')
+        fmt_prods = [
+                val if isinstance(val,str) else "VAR_" + val.head.replace('\'', '_')
+                for val in kernel.prod.production
+        ]
+        print(f"\t[{i+1}] = PROD({fmt_head},   {', '.join(fmt_prods)}),")
+print("};")
+
+
+

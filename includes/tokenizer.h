@@ -64,7 +64,10 @@ typedef  enum {
   TKTYPE_T_BOOL,
   TKTYPE_T_LONG,
   TKTYPE_T_DOUBLE,
-  TKTYPE_T_FLOAT
+  TKTYPE_T_FLOAT,
+
+  // sentinela para contar o numero de elementos
+  TKTYPE_NUM_TOKENS
 }TKTYPE;
 
 
@@ -79,6 +82,12 @@ typedef struct tk{
 // FUNCOES
 TokenList *tokenize(char *eval);
 char *type2str(TKTYPE t);
+
+// macros para printar
+#ifdef TOKENIZER_H_DEBUG
+  #define TKL_FMT "(%s, %s)"
+  #define TKL_ARGS(tkl) type2str(tkl->type), tkl->lexeme
+#endif // TOKENIZER_H_DEBUG
 
 #endif //TOKENIZER_H
 
