@@ -32,6 +32,7 @@ typedef  enum {
 
   //OPERADORES LOGICOS
   TKTYPE_EQUALS,
+  TKTYPE_NEQUALS,
   TKTYPE_GT,
   TKTYPE_GEQT,
   TKTYPE_LT,
@@ -66,7 +67,7 @@ typedef  enum {
   TKTYPE_T_DOUBLE,
   TKTYPE_T_FLOAT,
 
-  // sentinela para contar o numero de elementos
+  // sentinela para contar o numero de tokens
   TKTYPE_NUM_TOKENS
 }TKTYPE;
 

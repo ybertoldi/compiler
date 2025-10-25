@@ -31,16 +31,28 @@ int move_sv(StringView *sv){
     case '+':
     case '-':
     case '*':
-    case '/':
+    case '/': { 
       sv->start = p;
       sv->size = 1;
-      return 1;
+    } return 1;
+
+    case '\'':
+    case '\"': {
+      char cmp = *p;
+      n++;
+      while(p[n] && p[n] != cmp)
+        n++;
+      n++;
+      sv->start = p;
+      sv->size = n;
+    } return 1;
+
     default: break;
   }
   
   while (isalnum(p[n])) 
     n++;
-  
+
   sv->start = p;
   sv->size = n;
   return 1;
@@ -70,5 +82,23 @@ int readline(char *buffer, int bufmax) {
   }
   return 0;
 }
+
+/*------------------------HASHMAP--------------------------*/
+#define GROW_AT 0.60
+
+struct _bucket{
+  struct _bucket *next;
+  void *key;
+  size_t ksize;
+  uint32_t hash;
+  uintptr_t value;
+}
+
+typedef struct {
+  
+} Map;
+
+/*----------------------END HASHMAP------------------------*/
+
 #endif //COMMON_H
 

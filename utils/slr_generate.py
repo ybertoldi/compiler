@@ -175,7 +175,6 @@ while to_visit:
                 visited.append(gt)
         
 ## -- descomente para gerar a imagem do automato
-# pprint(C)
 # def draw_lr_automaton(start: Node, filename="automaton"):
 #     dot = graphviz.Digraph(format="png")
 #     visited = {}

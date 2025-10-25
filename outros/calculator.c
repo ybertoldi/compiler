@@ -44,7 +44,7 @@ int main(){
 int match(char *t) { return match_sv(&cur_sv, t); }
 void consume(char *t){
   if (!consume_sv(&cur_sv, t)){
-    fprintf(stderr, "syntax error\n");
+    fprintf(stderr, "syntax error, expecting: %s\n", t);
     exit(1);
   }
 }

@@ -350,106 +350,56 @@ TokenList *tokenize(char *eval){
 
 char *type2str(TKTYPE t) {
   switch (t) {
-  case TKTYPE_INIT:
-    return "INIT";
-  case TKTYPE_WTSP:
-    return "WTSP";
-  case TKTYPE_OPPAREN:
-    return "OPPAREN";
-  case TKTYPE_CLPAREN:
-    return "CLPAREN";
-  case TKTYPE_OPBRACKET:
-    return "OPBRACKET";
-  case TKTYPE_CLBRACKET:
-    return "CLBRACKET";
-  case TKTYPE_OPSQRBRACK:
-    return "OPSQRBRACK";
-  case TKTYPE_CLSQRBRACK:
-    return "CLSQRBRACK";
-  case TKTYPE_COMMA:
-    return "COMMA";
-  case TKTYPE_SMCOLON:
-    return "SMCOLON";
-  case TKTYPE_SUM:
-    return "SUM";
-  case TKTYPE_SUB:
-    return "SUB";
-  case TKTYPE_DIV:
-    return "DIV";
-  case TKTYPE_MULT:
-    return "MULT";
-  case TKTYPE_MOD:
-    return "MOD";
-  case TKTYPE_BITWISE_AND:
-    return "BITWISE_AND";
-  case TKTYPE_BITWISE_OR:
-    return "BITWISE_OR";
-  case TKTYPE_BITWISE_SHFTL:
-    return "BITWISE_SHFTL";
-  case TKTYPE_BITWISE_SHFTR:
-    return "BITWISE_SHFTR";
-  case TKTYPE_EQUALS:
-    return "EQUALS";
-  case TKTYPE_GT:
-    return "GT";
-  case TKTYPE_GEQT:
-    return "GEQT";
-  case TKTYPE_LT:
-    return "LT";
-  case TKTYPE_LEQT:
-    return "LEQT";
-  case TKTYPE_LOGIC_OR:
-    return "LOGIC_OR";
-  case TKTYPE_LOGIC_AND:
-    return "LOGIC_AND";
-  case TKTYPE_NEGATION:
-    return "NEGATION";
-  case TKTYPE_VAR:
-    return "VAR";
-  case TKTYPE_ATTRIBUTION:
-    return "ATTRIBUTION";
-  case TKTYPE_INT:
-    return "INT";
-  case TKTYPE_FLOAT:
-    return "FLOAT";
-  case TKTYPE_HEXINT:
-    return "HEXINT";
-  case TKTYPE_OCTALINT:
-    return "OCTALINT";
-  case TKTYPE_IF:
-    return "IF";
-  case TKTYPE_ELSE:
-    return "ELSE";
-  case TKTYPE_FOR:
-    return "FOR";
-  case TKTYPE_WHILE:
-    return "WHILE";
-  case TKTYPE_SWITCH:
-    return "SWITCH";
-  case TKTYPE_CASE:
-    return "CASE";
-  case TKTYPE_FALSE:
-    return "FALSE";
-  case TKTYPE_TRUE:
-    return "TRUE";
-  case TKTYPE_T_INT:
-    return "T_INT";
-  case TKTYPE_T_CHAR:
-    return "T_CHAR";
-  case TKTYPE_T_BOOL:
-    return "T_BOOL";
-  case TKTYPE_T_LONG:
-    return "T_LONG";
-  case TKTYPE_T_DOUBLE:
-    return "T_DOUBLE";
-  case TKTYPE_T_FLOAT:
-    return "T_FLOAT";
-  //TODO: adicionar
-  case TKTYPE_SINGLE_QUOTE:
-    return "SINGLE_QUOTE";
-  case TKTYPE_DOUBLE_QUOTE:
-    return "DOUBLE_QUOTE";
-  //TODO: adicionar caracteres de escape 
+  case TKTYPE_INIT: return "INIT";
+  case TKTYPE_WTSP: return "WTSP";
+  case TKTYPE_OPPAREN: return "OPPAREN";
+  case TKTYPE_CLPAREN: return "CLPAREN";
+  case TKTYPE_OPBRACKET: return "OPBRACKET";
+  case TKTYPE_CLBRACKET: return "CLBRACKET";
+  case TKTYPE_OPSQRBRACK: return "OPSQRBRACK";
+  case TKTYPE_CLSQRBRACK: return "CLSQRBRACK";
+  case TKTYPE_COMMA: return "COMMA";
+  case TKTYPE_SMCOLON: return "SMCOLON";
+  case TKTYPE_SUM: return "SUM";
+  case TKTYPE_SUB: return "SUB";
+  case TKTYPE_DIV: return "DIV";
+  case TKTYPE_MULT: return "MULT";
+  case TKTYPE_MOD: return "MOD";
+  case TKTYPE_BITWISE_AND: return "BITWISE_AND";
+  case TKTYPE_BITWISE_OR: return "BITWISE_OR";
+  case TKTYPE_BITWISE_SHFTL: return "BITWISE_SHFTL";
+  case TKTYPE_BITWISE_SHFTR: return "BITWISE_SHFTR";
+  case TKTYPE_EQUALS: return "EQUALS";
+  case TKTYPE_GT: return "GT";
+  case TKTYPE_GEQT: return "GEQT";
+  case TKTYPE_LT: return "LT";
+  case TKTYPE_LEQT: return "LEQT";
+  case TKTYPE_LOGIC_OR: return "LOGIC_OR";
+  case TKTYPE_LOGIC_AND: return "LOGIC_AND";
+  case TKTYPE_NEGATION: return "NEGATION";
+  case TKTYPE_VAR: return "VAR";
+  case TKTYPE_ATTRIBUTION: return "ATTRIBUTION";
+  case TKTYPE_INT: return "INT";
+  case TKTYPE_FLOAT: return "FLOAT";
+  case TKTYPE_HEXINT: return "HEXINT";
+  case TKTYPE_OCTALINT: return "OCTALINT";
+  case TKTYPE_IF: return "IF";
+  case TKTYPE_ELSE: return "ELSE";
+  case TKTYPE_FOR: return "FOR";
+  case TKTYPE_WHILE: return "WHILE";
+  case TKTYPE_SWITCH: return "SWITCH";
+  case TKTYPE_CASE: return "CASE";
+  case TKTYPE_FALSE: return "FALSE";
+  case TKTYPE_TRUE: return "TRUE";
+  case TKTYPE_T_INT: return "T_INT";
+  case TKTYPE_T_CHAR: return "T_CHAR";
+  case TKTYPE_T_BOOL: return "T_BOOL";
+  case TKTYPE_T_LONG: return "T_LONG";
+  case TKTYPE_T_DOUBLE: return "T_DOUBLE";
+  case TKTYPE_T_FLOAT: return "T_FLOAT";
+  //TODO: adicionar string literal
+  case TKTYPE_SINGLE_QUOTE: return "SINGLE_QUOTE";
+  case TKTYPE_DOUBLE_QUOTE: return "DOUBLE_QUOTE"; //TODO: adicionar caracteres de escape 
   default:
     fprintf(stderr, "ERRO: token nao especificado");
     exit(1);
