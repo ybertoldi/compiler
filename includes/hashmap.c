@@ -1,30 +1,11 @@
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hashmap.h"
 
 #define MAP_INITIAL_CAPACITY 32
-
-struct _bucket {
-  uint32_t hash;
-  void *key;
-  size_t ksize;
-  uintptr_t value;
-  struct _bucket *next;
-};
-
-typedef struct {
-  struct _bucket *values;
-  uint32_t capacity;
-  uint32_t count;
-
-  struct _bucket *first;
-  struct _bucket *last;
-} Map;
-
-
 Map *map_init(void){
   Map *m = malloc(sizeof(Map));
   if (m == NULL)
