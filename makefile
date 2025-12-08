@@ -9,6 +9,9 @@ Compiler: src/main.c $(objects)
 $(objects): %.o : src/%.c
 	gcc -c $^ -o lib/$@
 
+grammar.h slr.c: gramatica.bnf
+	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar_symbols.h -c src/slr.c
+
 
 
 

@@ -1,3 +1,4 @@
+#define TKL_D
 #include "../includes/dfa_node.h"
 
 #ifndef TOKENIZER_H

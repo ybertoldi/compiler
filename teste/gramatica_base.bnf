@@ -1,0 +1,23 @@
+<DEC>   ::= <TIPO> id  eq <EXPR> pv
+
+<EXPR>  ::= <EXPR>  <COND1> <EXPR1>  | <EXPR1>
+<EXPR1> ::= <EXPR1> <COND2> <EXPR2>  | <EXPR2>
+<EXPR2> ::= <EXPR2> <REL1>  <EXPR3>  | <EXPR3>
+<EXPR3> ::= <EXPR3> <REL2>  <EXPR4>  | <EXPR4>
+<EXPR4> ::= <EXPR4> <OP1>   <EXPR5>  | <EXPR5>
+<EXPR5> ::= <EXPR5> <OP2>   <EXPR6>  | <EXPR6>
+<EXPR6> ::= id  | const | ap <EXPR> fp
+
+
+// precedencia dos operadores basicos
+<COND1>  ::= `||`
+<COND2>  ::= `&&`
+<REL1>   ::= `==` | `!=`
+<REL2>   ::= `<`  | `<=` | `>` | `>=`
+<OP1>    ::=  `+` | `-`
+<OP2>    ::=  `*` | `/`
+
+// <NOT>    ::=  `!`
+// <ACCESS> ::=  `[]`
+
+<TIPO>  ::= long | int | char | bool | float | double

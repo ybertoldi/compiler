@@ -1,9 +1,8 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
-from os.path import isfile
+from os import getcwd
+from os.path import isfile, relpath
 import sys
-# import graphviz #-- descomente se quiser gerar a imagem do automato
-
 
 @dataclass
 class Prod:
@@ -64,14 +63,40 @@ class Node:
     def __eq__(self, other) -> bool:
         return isinstance(other, Node) and set(self.items) == set(other.items)
 
+
+
+TARGET_FILE = False
+HEADER_N_SRC = False
+src_filename = ""
+header_filename = ""
+
 if (len(sys.argv) < 2):
-    print(f"usage: {sys.argv[0]} <bnf-file>")
+    print(f"usage: {sys.argv[0]} <bnf-file> [-f <dest.c>] [-h <header-file.h> -c <c-file.c>]")
     exit(1)
 if not isfile(sys.argv[1]):
     print(f"usage: {sys.argv[0]} <bnf-file>. Could not identify file '{sys.argv[1]}'")
     exit(1)
+
 with open(sys.argv[1], 'r') as f:
     bnf = f.read()
+
+header_fd = sys.stdout
+src_fd = sys.stdout
+if "-f" in sys.argv:
+    TARGET_FILE = True
+
+    tgt_name = sys.argv[sys.argv.index("-f")+1]
+    header_fd = open(tgt_name, "w")
+    src_fd = header_fd
+elif "-h" in sys.argv and "-c" in sys.argv:
+    HEADER_N_SRC = True
+
+    header_filename = sys.argv[sys.argv.index("-h")+1]
+    src_filename = sys.argv[sys.argv.index("-c")+1]
+    src_fd = open(src_filename, "w")
+    header_fd = open(header_filename, "w")
+
+
 
 variables_cache: dict[str, Variable] = {}
 variables: list[Variable] = []
@@ -174,73 +199,59 @@ while to_visit:
                 to_visit.append(gt)
                 visited.append(gt)
         
-## -- descomente para gerar a imagem do automato
-# def draw_lr_automaton(start: Node, filename="automaton"):
-#     dot = graphviz.Digraph(format="png")
-#     visited = {}
-#     counter = [0]
-# 
-#     def node_label(node):
-#         lines = [str(it) for it in node.items]
-#         return "\n".join(lines)
-# 
-#     def dfs(node):
-#         if id(node) in visited:
-#             return
-#         idx = counter[0]
-#         counter[0] += 1
-#         visited[id(node)] = f"I{idx}"
-# 
-#         label = node_label(node)
-#         dot.node(visited[id(node)], label=label, shape="box", fontsize="10", fontname="monospace")
-# 
-#         for sym, nxt in node.goto.items():
-#             dfs(nxt)
-#             dot.edge(visited[id(node)], visited[id(nxt)], label=str(sym))
-# 
-#     dfs(start)
-#     dot.render(filename, view=True)
-# 
-# draw_lr_automaton(C)
+
+
+
+######################GERANDO O CODIGO###########################
+
 
 
 # struct para as derivacoes
-print(
+header_fd.write("#include \"tokenizer.h\"\n\n")
+
+header_fd.write(
 """
 typedef struct {
   long target;
   long elements[256];
   long num_elems;
-} Production;
-#define PROD(tgt, ...) (Production) \\
-        {.target = tgt, .elements = {__VA_ARGS__}, .num_elems = (sizeof((long[]){__VA_ARGS__})/sizeof(long))}
+} Production;\n
 """)
 
 # enum com as variaveis da gramatica
 enumlines = []
-print("typedef enum {")
+header_fd.write("typedef enum {")
 for i, var in enumerate(variables):
     enumlines.append(
             f"VAR_{var.head.replace('\'', '_')}" 
             + (" = TKTYPE_NUM_TOKENS" if i == 0 else "")
     )
 enumlines.append("VAR_NUM_VARS")
-print("\t" + ",\n\t".join(enumlines))
-print("} VARTYPE;\n")
+header_fd.write("\t" + ",\n\t".join(enumlines))
+header_fd.write("} VARTYPE;\n")
+
+if HEADER_N_SRC:
+    header_relpath = relpath(header_filename, src_filename);
+    src_fd.write(f"#include \"{header_relpath}\"\n")
 
 # tabela goto
-print(f"long goto_table[{len(nodes)+1}][VAR_NUM_VARS] = {{")
+src_fd.write(f"long goto_table[{len(nodes)+1}][VAR_NUM_VARS] = {{\n")
 for i, node in enumerate(nodes):
     p = []
     for entry, dest in node.goto.items():
         entry_str = entry if isinstance(entry, str)\
                 else f"VAR_{entry.head.replace('\'', '_')}"
-        p.append(f"[{entry_str}] = {nodes.index(dest) + 1}")
-    print(f"\t[{i+1}] = {{ {', '.join(p)} }},")
-print("};\n")
+        p.append(f"[{entry_str}] = {nodes.index(dest) + 1}\n")
+    src_fd.write(f"\t[{i+1}] = {{ {', '.join(p)} }},\n")
+src_fd.write("};\n\n")
 
 # tabela das producoes
-print(f"Production reduce[{len(nodes)+1}] = {{")
+src_fd.write(
+"""#define PROD(tgt, ...) (Production) \\
+                {.target = tgt, .elements = {__VA_ARGS__}, .num_elems = (sizeof((long[]){__VA_ARGS__})/sizeof(long))}
+""")
+
+src_fd.write(f"Production reduce[{len(nodes)+1}] = {{\n")
 for i, node in enumerate(nodes):
     p = []
     kernel = node.items[0]
@@ -250,8 +261,6 @@ for i, node in enumerate(nodes):
                 val if isinstance(val,str) else "VAR_" + val.head.replace('\'', '_')
                 for val in kernel.prod.production
         ]
-        print(f"\t[{i+1}] = PROD({fmt_head},   {', '.join(fmt_prods)}),")
-print("};")
-
-
+        src_fd.write(f"\t[{i+1}] = PROD({fmt_head},   {', '.join(fmt_prods)}),\n")
+src_fd.write("};\n")
 
