@@ -43,11 +43,11 @@ void dfa_add_delta(DfaNode *node, char key, DfaNode *value) {
  */
 void dfa_add_delta_expr(DfaNode *s, char *expr, DfaNode *t){
   int i;
-  size_t to_addlen;
+  long to_addlen;
   char invchars[256] = {0};
   bool az, AZ, nums;
 
-  to_addlen = strchr(expr, '[') ? (strchr(expr, '[') - expr) : strlen(expr);
+  to_addlen = strchr(expr, '[') ?  (strchr(expr, '[') - expr) : (long) strlen(expr);
   i = -1;
   while (++i < to_addlen)
     dfa_add_delta(s, expr[i], t);

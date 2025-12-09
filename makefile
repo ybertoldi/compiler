@@ -3,20 +3,18 @@ CFLAGS= -O2 -g -Wall -Wextra
 LIB= lib/dfa_node.o lib/hashmap.o lib/tokenizer.o
 objects= dfa_node.o hashmap.o tokenizer.o
 
+
+
 Compiler: src/main.c $(objects)
 	gcc src/main.c $(LIB) $(CFLAGS) -o Compiler
 
 $(objects): %.o : src/%.c
-	gcc -c $^ -o lib/$@
+	gcc -c $^ -o lib/$@ $(CFLAGS)
 
 grammar.h slr.c: gramatica.bnf
-	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar_symbols.h -c src/slr.c
+	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr.c
 
-
-
-
-
-
-
+test: Compiler
+	mv Compiler teste
 
 

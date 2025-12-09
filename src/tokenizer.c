@@ -319,7 +319,7 @@ TokenList *tokenize(char *eval){
   }
 
   int i = 0;
-  TokenList *curlist = NULL, *head;
+  TokenList *curlist = NULL, *head = NULL;
   DfaNode *curnode = &q0;
 
   while (eval[i]) {
