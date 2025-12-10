@@ -207,8 +207,11 @@ while to_visit:
 
 
 # struct para as derivacoes
-header_fd.write("#include \"tokenizer.h\"\n\n")
 
+if HEADER_N_SRC:
+    header_fd.write("#ifndef GRAMMAR_H\n#define GRAMMAR_H\n\n")
+
+header_fd.write("#include \"tokenizer.h\"\n\n")
 header_fd.write(
 """
 typedef struct {
@@ -220,6 +223,9 @@ typedef struct {
 
 # enum com as variaveis da gramatica
 enumlines = []
+start_symbol = variables[0]
+header_fd.write(f"#define START_SYMBOL VAR_{start_symbol.head.replace('\'', '_')}\n")
+
 header_fd.write("typedef enum {")
 for i, var in enumerate(variables):
     enumlines.append(
@@ -228,11 +234,21 @@ for i, var in enumerate(variables):
     )
 enumlines.append("VAR_NUM_VARS")
 header_fd.write("\t" + ",\n\t".join(enumlines))
-header_fd.write("} VARTYPE;\n")
+header_fd.write("} VARTYPE;\n\n")
+
+header_fd.write("\n\n")
 
 if HEADER_N_SRC:
-    header_relpath = relpath(header_filename, src_filename);
+    header_fd.write("char *var2str(VARTYPE t);\n\n")
+    header_fd.write(f"extern long goto_table[{len(nodes)+1}][VAR_NUM_VARS];\n")
+    header_fd.write(f"extern Production reduce[{len(nodes)+1}];\n")
+    
+    header_fd.write("#endif // GRAMMAR_H")
+
+if HEADER_N_SRC:
+    header_relpath = relpath(header_filename, src_filename).removeprefix("../");
     src_fd.write(f"#include \"{header_relpath}\"\n")
+    src_fd.write(f"#include <assert.h>\n")
 
 # tabela goto
 src_fd.write(f"long goto_table[{len(nodes)+1}][VAR_NUM_VARS] = {{\n")
@@ -263,4 +279,15 @@ for i, node in enumerate(nodes):
         ]
         src_fd.write(f"\t[{i+1}] = PROD({fmt_head},   {', '.join(fmt_prods)}),\n")
 src_fd.write("};\n")
+
+src_fd.write("char *var2str(VARTYPE t){\n")
+src_fd.write("  switch(t){\n")
+
+for var in variables:
+    varname = "VAR_" + var.head.replace('\'', '_')
+    src_fd.write(f"    case {varname}: return \"{varname}\";\n")
+src_fd.write("    default: assert(0 && \"type2str: invalid value\");\n")
+
+src_fd.write("  }\n")
+src_fd.write("}\n")
 

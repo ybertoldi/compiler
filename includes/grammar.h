@@ -1,3 +1,6 @@
+#ifndef GRAMMAR_H
+#define GRAMMAR_H
+
 #include "tokenizer.h"
 
 
@@ -7,6 +10,7 @@ typedef struct {
   long num_elems;
 } Production;
 
+#define START_SYMBOL VAR_DEC
 typedef enum {	VAR_DEC = TKTYPE_NUM_TOKENS,
 	VAR_EXPR,
 	VAR_EXPR1,
@@ -23,7 +27,12 @@ typedef enum {	VAR_DEC = TKTYPE_NUM_TOKENS,
 	VAR_OP2,
 	VAR_CONST,
 	VAR_TIPO,
-	VAR_NUM_VARS
-} VARTYPE;
+	VAR_NUM_VARS} VARTYPE;
 
 
+
+extern char *var2str(VARTYPE t);
+
+extern long goto_table[54][VAR_NUM_VARS];
+extern Production reduce[54];
+#endif // GRAMMAR_H
