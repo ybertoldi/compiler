@@ -1,28 +1,26 @@
 CFLAGS= -O2 -g -Wall -Wextra 
+LIB_COMMON= lib/dfa_node.o lib/hashmap.o lib/tokenizer.o
 
-LIB= lib/dfa_node.o lib/hashmap.o lib/tokenizer.o
-objects= dfa_node.o hashmap.o tokenizer.o
+Compiler: src/main.c $(LIB_COMMON)
+	gcc src/main.c $(LIB_COMMON) -o Compiler $(CFLAGS)
 
-
-
-Compiler: src/main.c $(objects)
-	gcc src/main.c $(LIB) $(CFLAGS) -o Compiler
-
-$(objects): %.o : src/%.c
-	gcc -c $^ -o lib/$@ $(CFLAGS)
-
-lib/slr_tables.o: src/slr_tables.c
+$(LIB_COMMON): src/hashmap.c src/tokenizer.c src/dfa_node.c
+	gcc -c src/hashmap.c -o lib/hashmap.o $(CFLAGS);
+	gcc -c src/tokenizer.c -o lib/tokenizer.o $(CFLAGS);
+	gcc -c src/dfa_node.c -o lib/dfa_node.o $(CFLAGS)
 
 includes/grammar.h src/slr_tables.c: gramatica.bnf
 	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr_tables.c
 
-test: Compiler
-	mv Compiler teste
-
 lib/slr_tables.o: src/slr_tables.c
 	gcc -c src/slr_tables.c -o lib/slr_tables.o $(CFLAGS)
 
-test_slr: $(LIB) lib/slr_tables.o
-	gcc src/slr.c $(LIB) lib/slr_tables.o -o teste/srl -g
+test_compiler: Compiler
+	mkdir -p teste; mv Compiler teste
 
+test_slr: $(LIB_COMMON) lib/slr_tables.o
+	mkdir -p teste/slr_test;
+	gcc src/slr.c $(LIB_COMMON) lib/slr_tables.o -o teste/slr_test/slr $(CFLAGS);
+	echo "int x = 20;\nbool y = false;" > teste/slr_test/src.lang;
+	echo "./slr < src.lang" > teste/slr_test/run.sh
 
