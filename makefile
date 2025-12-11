@@ -11,10 +11,18 @@ Compiler: src/main.c $(objects)
 $(objects): %.o : src/%.c
 	gcc -c $^ -o lib/$@ $(CFLAGS)
 
-grammar.h slr.c: gramatica.bnf
-	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr.c
+lib/slr_tables.o: src/slr_tables.c
+
+includes/grammar.h src/slr_tables.c: gramatica.bnf
+	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr_tables.c
 
 test: Compiler
 	mv Compiler teste
+
+lib/slr_tables.o: src/slr_tables.c
+	gcc -c src/slr_tables.c -o lib/slr_tables.o $(CFLAGS)
+
+test_slr: $(LIB) lib/slr_tables.o
+	gcc src/slr.c $(LIB) lib/slr_tables.o -o teste/srl -g
 
 

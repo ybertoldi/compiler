@@ -10,8 +10,10 @@ typedef struct {
   long num_elems;
 } Production;
 
-#define START_SYMBOL VAR_DEC
-typedef enum {	VAR_DEC = TKTYPE_NUM_TOKENS,
+#define START_SYMBOL VAR_STMTS
+typedef enum {	VAR_STMTS = TKTYPE_NUM_TOKENS,
+	VAR_STMT,
+	VAR_DEC,
 	VAR_EXPR,
 	VAR_EXPR1,
 	VAR_EXPR2,
@@ -31,8 +33,8 @@ typedef enum {	VAR_DEC = TKTYPE_NUM_TOKENS,
 
 
 
-extern char *var2str(VARTYPE t);
+char *var2str(VARTYPE t);
 
-extern long goto_table[54][VAR_NUM_VARS];
-extern Production reduce[54];
+extern long goto_table[58][VAR_NUM_VARS];
+extern Production reduce[58];
 #endif // GRAMMAR_H
