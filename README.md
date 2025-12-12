@@ -6,7 +6,7 @@ Certifique-se de possuir git e GNU Make instalados no seu sistema. Para baixar e
 ```bash
 git clone https://github.com/ybertoldi/compiler.git
 cd compiler
-make test
+make test_compiler
 ```
 
 # Testando

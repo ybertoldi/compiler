@@ -9,7 +9,7 @@ $(LIB_COMMON): src/hashmap.c src/tokenizer.c src/dfa_node.c
 	gcc -c src/tokenizer.c -o lib/tokenizer.o $(CFLAGS);
 	gcc -c src/dfa_node.c -o lib/dfa_node.o $(CFLAGS)
 
-includes/grammar.h src/slr_tables.c: gramatica.bnf
+includes/grammar.h src/slr_tables.c: gramatica.bnf utils/slr_generate.py
 	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr_tables.c
 
 lib/slr_tables.o: src/slr_tables.c

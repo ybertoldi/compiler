@@ -241,7 +241,7 @@ header_fd.write("\n\n")
 if HEADER_N_SRC:
     header_fd.write("char *var2str(VARTYPE t);\n\n")
     header_fd.write(f"extern long goto_table[{len(nodes)+1}][VAR_NUM_VARS];\n")
-    header_fd.write(f"extern Production reduce[{len(nodes)+1}];\n")
+    header_fd.write(f"extern Production rdc_table[{len(nodes)+1}];\n")
     
     header_fd.write("#endif // GRAMMAR_H")
 
@@ -267,7 +267,7 @@ src_fd.write(
                 {.target = tgt, .elements = {__VA_ARGS__}, .num_elems = (sizeof((long[]){__VA_ARGS__})/sizeof(long))}
 """)
 
-src_fd.write(f"Production reduce[{len(nodes)+1}] = {{\n")
+src_fd.write(f"Production rdc_table[{len(nodes)+1}] = {{\n")
 for i, node in enumerate(nodes):
     p = []
     kernel = node.items[0]

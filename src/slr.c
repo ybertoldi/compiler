@@ -1,6 +1,6 @@
 #include "../includes/tokenizer.h"
-#include "../includes/common.h"
 #include "../includes/grammar.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +18,8 @@ static long syp = 0;
 static void symbol_push(long v) { assert(syp < STACK_SIZE); symbols_stack[syp++] = v; }
 static long symbol_pop(void)    { assert(syp > 0);          return symbols_stack[--syp]; }
 static long symbol_peek(void)   { assert(syp > 0);          return symbols_stack[syp - 1]; }
+
+void do_reduction(Production *p);
 
 static void printstate(long t) {
   printf("STATES = {");
@@ -61,7 +63,7 @@ int main() {
       state_push(gt_state);
       tklist = tklist->next;
     } else {
-      Production p = reduce[state_peek()];
+      Production p = rdc_table[state_peek()];
 
       if (p.target == 0) {
         if (parse_state == PARSING_EOF){
@@ -72,17 +74,7 @@ int main() {
         }
       }
 
-      for (int i = p.num_elems - 1; i >= 0; i--) {
-        if (p.elements[i] != symbol_pop()) {
-          fprintf(stderr, "syntax error, expecting %s\n",
-                  (p.elements[i] > TKTYPE_NUM_TOKENS)
-                      ? var2str(p.elements[i])
-                      : type2str(p.elements[i]));
-          exit(1);
-        }
-
-        state_pop();
-      }
+      do_reduction(&p);
 
       symbol_push(p.target);
       if ((gt_state = goto_table[state_peek()][p.target]) != 0) {
@@ -100,4 +92,30 @@ int main() {
     printf("ERR\n\n");
   }
   return 0;
+}
+
+static inline void unexpected_symbol_err(long expected) {
+  char *expected_str;
+  if (expected >= TKTYPE_NUM_TOKENS){
+    expected_str = var2str(expected);
+  } else {
+    expected_str = type2str(expected);
+  }
+
+  fprintf(stderr, "syntax error, expecting %s\n", expected_str);
+  exit(1);
+}
+
+void do_reduction(Production *p){
+  switch (p->target) {
+    default: {
+      for (int i = p->num_elems - 1; i >= 0; i--) {
+        if (p->elements[i] != symbol_pop()) 
+          unexpected_symbol_err(p->elements[i]);
+
+        state_pop();
+      }
+    } break;
+
+  }
 }

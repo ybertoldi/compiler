@@ -1,6 +1,6 @@
 #include "../includes/grammar.h"
 #include <assert.h>
-long goto_table[58][VAR_NUM_VARS] = {
+long goto_table[70][VAR_NUM_VARS] = {
 	[1] = { [VAR_STMTS] = 2
 , [VAR_STMT] = 3
 , [VAR_DEC] = 4
@@ -37,198 +37,361 @@ long goto_table[58][VAR_NUM_VARS] = {
  },
 	[14] = { [TKTYPE_VAR] = 15
 , [VAR_EXPR] = 16
-, [VAR_EXPR1] = 17
-, [VAR_EXPR2] = 18
-, [VAR_EXPR3] = 19
-, [VAR_EXPR4] = 20
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+, [VAR_LOGIC_OR] = 17
+, [VAR_EXPR1] = 18
+, [VAR_LOGIC_AND] = 19
+, [VAR_EXPR2] = 20
+, [VAR_CMP_EQ] = 21
+, [VAR_CMP_NEQ] = 22
+, [VAR_EXPR3] = 23
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
 	[15] = {  },
-	[16] = { [TKTYPE_SMCOLON] = 31
-, [VAR_COND1] = 32
-, [TKTYPE_LOGIC_OR] = 33
+	[16] = { [TKTYPE_SMCOLON] = 43
+, [TKTYPE_LOGIC_OR] = 44
  },
-	[17] = { [VAR_COND2] = 34
-, [TKTYPE_LOGIC_AND] = 35
+	[17] = {  },
+	[18] = { [TKTYPE_LOGIC_AND] = 45
  },
-	[18] = { [VAR_REL1] = 36
-, [TKTYPE_EQUALS] = 37
-, [TKTYPE_NEQUALS] = 38
+	[19] = {  },
+	[20] = { [TKTYPE_EQUALS] = 46
+, [TKTYPE_NEQUALS] = 47
  },
-	[19] = { [VAR_REL2] = 39
-, [TKTYPE_LT] = 40
-, [TKTYPE_LEQT] = 41
-, [TKTYPE_GT] = 42
-, [TKTYPE_GEQT] = 43
- },
-	[20] = { [VAR_OP1] = 44
-, [TKTYPE_SUM] = 45
-, [TKTYPE_SUB] = 46
- },
-	[21] = { [VAR_OP2] = 47
-, [TKTYPE_MULT] = 48
-, [TKTYPE_DIV] = 49
- },
+	[21] = {  },
 	[22] = {  },
-	[23] = {  },
-	[24] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR] = 50
-, [VAR_EXPR1] = 17
-, [VAR_EXPR2] = 18
-, [VAR_EXPR3] = 19
-, [VAR_EXPR4] = 20
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+	[23] = { [TKTYPE_LT] = 48
+, [TKTYPE_LEQT] = 49
+, [TKTYPE_GT] = 50
+, [TKTYPE_GEQT] = 51
  },
+	[24] = {  },
 	[25] = {  },
 	[26] = {  },
 	[27] = {  },
-	[28] = {  },
+	[28] = { [TKTYPE_MULT] = 52
+, [TKTYPE_DIV] = 53
+ },
 	[29] = {  },
 	[30] = {  },
-	[31] = {  },
-	[32] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR1] = 51
-, [VAR_EXPR2] = 18
-, [VAR_EXPR3] = 19
-, [VAR_EXPR4] = 20
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+	[31] = { [TKTYPE_SUM] = 54
+, [TKTYPE_SUB] = 55
  },
+	[32] = {  },
 	[33] = {  },
-	[34] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR2] = 52
-, [VAR_EXPR3] = 19
-, [VAR_EXPR4] = 20
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
- },
+	[34] = {  },
 	[35] = {  },
 	[36] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR3] = 53
-, [VAR_EXPR4] = 20
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+, [VAR_EXPR] = 56
+, [VAR_LOGIC_OR] = 17
+, [VAR_EXPR1] = 18
+, [VAR_LOGIC_AND] = 19
+, [VAR_EXPR2] = 20
+, [VAR_CMP_EQ] = 21
+, [VAR_CMP_NEQ] = 22
+, [VAR_EXPR3] = 23
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
 	[37] = {  },
 	[38] = {  },
-	[39] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR4] = 54
-, [VAR_EXPR5] = 21
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
- },
+	[39] = {  },
 	[40] = {  },
 	[41] = {  },
 	[42] = {  },
 	[43] = {  },
 	[44] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR5] = 55
-, [VAR_EXPR6] = 22
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+, [VAR_EXPR1] = 57
+, [VAR_LOGIC_AND] = 19
+, [VAR_EXPR2] = 20
+, [VAR_CMP_EQ] = 21
+, [VAR_CMP_NEQ] = 22
+, [VAR_EXPR3] = 23
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[45] = {  },
-	[46] = {  },
+	[45] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR2] = 58
+, [VAR_CMP_EQ] = 21
+, [VAR_CMP_NEQ] = 22
+, [VAR_EXPR3] = 23
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
+ },
+	[46] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR3] = 59
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
+ },
 	[47] = { [TKTYPE_VAR] = 15
-, [VAR_EXPR6] = 56
-, [VAR_CONST] = 23
-, [TKTYPE_OPPAREN] = 24
-, [TKTYPE_INT] = 25
-, [TKTYPE_FLOAT] = 26
-, [TKTYPE_HEXINT] = 27
-, [TKTYPE_OCTALINT] = 28
-, [TKTYPE_FALSE] = 29
-, [TKTYPE_TRUE] = 30
+, [VAR_EXPR3] = 60
+, [VAR_CMP_LT] = 24
+, [VAR_CMP_LEQT] = 25
+, [VAR_CMP_GT] = 26
+, [VAR_CMP_GEQT] = 27
+, [VAR_EXPR4] = 28
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[48] = {  },
-	[49] = {  },
-	[50] = { [VAR_COND1] = 32
-, [TKTYPE_CLPAREN] = 57
-, [TKTYPE_LOGIC_OR] = 33
+	[48] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR4] = 61
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[51] = { [VAR_COND2] = 34
-, [TKTYPE_LOGIC_AND] = 35
+	[49] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR4] = 62
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[52] = { [VAR_REL1] = 36
-, [TKTYPE_EQUALS] = 37
-, [TKTYPE_NEQUALS] = 38
+	[50] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR4] = 63
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[53] = { [VAR_REL2] = 39
-, [TKTYPE_LT] = 40
-, [TKTYPE_LEQT] = 41
-, [TKTYPE_GT] = 42
-, [TKTYPE_GEQT] = 43
+	[51] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR4] = 64
+, [VAR_DIV] = 29
+, [VAR_MULT] = 30
+, [VAR_EXPR5] = 31
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[54] = { [VAR_OP1] = 44
-, [TKTYPE_SUM] = 45
-, [TKTYPE_SUB] = 46
+	[52] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR5] = 65
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[55] = { [VAR_OP2] = 47
-, [TKTYPE_MULT] = 48
-, [TKTYPE_DIV] = 49
+	[53] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR5] = 66
+, [VAR_SUM] = 32
+, [VAR_SUB] = 33
+, [VAR_EXPR6] = 34
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
  },
-	[56] = {  },
-	[57] = {  },
+	[54] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR6] = 67
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
+ },
+	[55] = { [TKTYPE_VAR] = 15
+, [VAR_EXPR6] = 68
+, [VAR_CONST] = 35
+, [TKTYPE_OPPAREN] = 36
+, [TKTYPE_INT] = 37
+, [TKTYPE_FLOAT] = 38
+, [TKTYPE_HEXINT] = 39
+, [TKTYPE_OCTALINT] = 40
+, [TKTYPE_FALSE] = 41
+, [TKTYPE_TRUE] = 42
+ },
+	[56] = { [TKTYPE_LOGIC_OR] = 44
+, [TKTYPE_CLPAREN] = 69
+ },
+	[57] = { [TKTYPE_LOGIC_AND] = 45
+ },
+	[58] = { [TKTYPE_EQUALS] = 46
+, [TKTYPE_NEQUALS] = 47
+ },
+	[59] = { [TKTYPE_LT] = 48
+, [TKTYPE_LEQT] = 49
+, [TKTYPE_GT] = 50
+, [TKTYPE_GEQT] = 51
+ },
+	[60] = { [TKTYPE_LT] = 48
+, [TKTYPE_LEQT] = 49
+, [TKTYPE_GT] = 50
+, [TKTYPE_GEQT] = 51
+ },
+	[61] = { [TKTYPE_MULT] = 52
+, [TKTYPE_DIV] = 53
+ },
+	[62] = { [TKTYPE_MULT] = 52
+, [TKTYPE_DIV] = 53
+ },
+	[63] = { [TKTYPE_MULT] = 52
+, [TKTYPE_DIV] = 53
+ },
+	[64] = { [TKTYPE_MULT] = 52
+, [TKTYPE_DIV] = 53
+ },
+	[65] = { [TKTYPE_SUM] = 54
+, [TKTYPE_SUB] = 55
+ },
+	[66] = { [TKTYPE_SUM] = 54
+, [TKTYPE_SUB] = 55
+ },
+	[67] = {  },
+	[68] = {  },
+	[69] = {  },
 };
 
 #define PROD(tgt, ...) (Production) \
                 {.target = tgt, .elements = {__VA_ARGS__}, .num_elems = (sizeof((long[]){__VA_ARGS__})/sizeof(long))}
-Production reduce[58] = {
+Production rdc_table[70] = {
 	[3] = PROD(VAR_STMTS,   VAR_STMT),
 	[4] = PROD(VAR_STMT,   VAR_DEC),
 	[6] = PROD(VAR_TIPO,   TKTYPE_T_INT),
@@ -239,39 +402,45 @@ Production reduce[58] = {
 	[11] = PROD(VAR_TIPO,   TKTYPE_T_DOUBLE),
 	[12] = PROD(VAR_STMTS,   VAR_STMTS, VAR_STMT),
 	[15] = PROD(VAR_EXPR6,   TKTYPE_VAR),
-	[17] = PROD(VAR_EXPR,   VAR_EXPR1),
-	[18] = PROD(VAR_EXPR1,   VAR_EXPR2),
-	[19] = PROD(VAR_EXPR2,   VAR_EXPR3),
-	[20] = PROD(VAR_EXPR3,   VAR_EXPR4),
-	[21] = PROD(VAR_EXPR4,   VAR_EXPR5),
-	[22] = PROD(VAR_EXPR5,   VAR_EXPR6),
-	[23] = PROD(VAR_EXPR6,   VAR_CONST),
-	[25] = PROD(VAR_CONST,   TKTYPE_INT),
-	[26] = PROD(VAR_CONST,   TKTYPE_FLOAT),
-	[27] = PROD(VAR_CONST,   TKTYPE_HEXINT),
-	[28] = PROD(VAR_CONST,   TKTYPE_OCTALINT),
-	[29] = PROD(VAR_CONST,   TKTYPE_FALSE),
-	[30] = PROD(VAR_CONST,   TKTYPE_TRUE),
-	[31] = PROD(VAR_DEC,   VAR_TIPO, TKTYPE_VAR, TKTYPE_ATTRIBUTION, VAR_EXPR, TKTYPE_SMCOLON),
-	[33] = PROD(VAR_COND1,   TKTYPE_LOGIC_OR),
-	[35] = PROD(VAR_COND2,   TKTYPE_LOGIC_AND),
-	[37] = PROD(VAR_REL1,   TKTYPE_EQUALS),
-	[38] = PROD(VAR_REL1,   TKTYPE_NEQUALS),
-	[40] = PROD(VAR_REL2,   TKTYPE_LT),
-	[41] = PROD(VAR_REL2,   TKTYPE_LEQT),
-	[42] = PROD(VAR_REL2,   TKTYPE_GT),
-	[43] = PROD(VAR_REL2,   TKTYPE_GEQT),
-	[45] = PROD(VAR_OP1,   TKTYPE_SUM),
-	[46] = PROD(VAR_OP1,   TKTYPE_SUB),
-	[48] = PROD(VAR_OP2,   TKTYPE_MULT),
-	[49] = PROD(VAR_OP2,   TKTYPE_DIV),
-	[51] = PROD(VAR_EXPR,   VAR_EXPR, VAR_COND1, VAR_EXPR1),
-	[52] = PROD(VAR_EXPR1,   VAR_EXPR1, VAR_COND2, VAR_EXPR2),
-	[53] = PROD(VAR_EXPR2,   VAR_EXPR2, VAR_REL1, VAR_EXPR3),
-	[54] = PROD(VAR_EXPR3,   VAR_EXPR3, VAR_REL2, VAR_EXPR4),
-	[55] = PROD(VAR_EXPR4,   VAR_EXPR4, VAR_OP1, VAR_EXPR5),
-	[56] = PROD(VAR_EXPR5,   VAR_EXPR5, VAR_OP2, VAR_EXPR6),
-	[57] = PROD(VAR_EXPR6,   TKTYPE_OPPAREN, VAR_EXPR, TKTYPE_CLPAREN),
+	[17] = PROD(VAR_EXPR,   VAR_LOGIC_OR),
+	[18] = PROD(VAR_EXPR,   VAR_EXPR1),
+	[19] = PROD(VAR_EXPR1,   VAR_LOGIC_AND),
+	[20] = PROD(VAR_EXPR1,   VAR_EXPR2),
+	[21] = PROD(VAR_EXPR2,   VAR_CMP_EQ),
+	[22] = PROD(VAR_EXPR2,   VAR_CMP_NEQ),
+	[23] = PROD(VAR_EXPR2,   VAR_EXPR3),
+	[24] = PROD(VAR_EXPR3,   VAR_CMP_LT),
+	[25] = PROD(VAR_EXPR3,   VAR_CMP_LEQT),
+	[26] = PROD(VAR_EXPR3,   VAR_CMP_GT),
+	[27] = PROD(VAR_EXPR3,   VAR_CMP_GEQT),
+	[28] = PROD(VAR_EXPR3,   VAR_EXPR4),
+	[29] = PROD(VAR_EXPR4,   VAR_DIV),
+	[30] = PROD(VAR_EXPR4,   VAR_MULT),
+	[31] = PROD(VAR_EXPR4,   VAR_EXPR5),
+	[32] = PROD(VAR_EXPR5,   VAR_SUM),
+	[33] = PROD(VAR_EXPR5,   VAR_SUB),
+	[34] = PROD(VAR_EXPR5,   VAR_EXPR6),
+	[35] = PROD(VAR_EXPR6,   VAR_CONST),
+	[37] = PROD(VAR_CONST,   TKTYPE_INT),
+	[38] = PROD(VAR_CONST,   TKTYPE_FLOAT),
+	[39] = PROD(VAR_CONST,   TKTYPE_HEXINT),
+	[40] = PROD(VAR_CONST,   TKTYPE_OCTALINT),
+	[41] = PROD(VAR_CONST,   TKTYPE_FALSE),
+	[42] = PROD(VAR_CONST,   TKTYPE_TRUE),
+	[43] = PROD(VAR_DEC,   VAR_TIPO, TKTYPE_VAR, TKTYPE_ATTRIBUTION, VAR_EXPR, TKTYPE_SMCOLON),
+	[57] = PROD(VAR_LOGIC_OR,   VAR_EXPR, TKTYPE_LOGIC_OR, VAR_EXPR1),
+	[58] = PROD(VAR_LOGIC_AND,   VAR_EXPR1, TKTYPE_LOGIC_AND, VAR_EXPR2),
+	[59] = PROD(VAR_CMP_NEQ,   VAR_EXPR2, TKTYPE_EQUALS, VAR_EXPR3),
+	[60] = PROD(VAR_CMP_EQ,   VAR_EXPR2, TKTYPE_NEQUALS, VAR_EXPR3),
+	[61] = PROD(VAR_CMP_LT,   VAR_EXPR3, TKTYPE_LT, VAR_EXPR4),
+	[62] = PROD(VAR_CMP_LEQT,   VAR_EXPR3, TKTYPE_LEQT, VAR_EXPR4),
+	[63] = PROD(VAR_CMP_GT,   VAR_EXPR3, TKTYPE_GT, VAR_EXPR4),
+	[64] = PROD(VAR_CMP_GEQT,   VAR_EXPR3, TKTYPE_GEQT, VAR_EXPR4),
+	[65] = PROD(VAR_MULT,   VAR_EXPR4, TKTYPE_MULT, VAR_EXPR5),
+	[66] = PROD(VAR_DIV,   VAR_EXPR4, TKTYPE_DIV, VAR_EXPR5),
+	[67] = PROD(VAR_SUM,   VAR_EXPR5, TKTYPE_SUM, VAR_EXPR6),
+	[68] = PROD(VAR_SUB,   VAR_EXPR5, TKTYPE_SUB, VAR_EXPR6),
+	[69] = PROD(VAR_EXPR6,   TKTYPE_OPPAREN, VAR_EXPR, TKTYPE_CLPAREN),
 };
 char *var2str(VARTYPE t){
   switch(t){
@@ -279,18 +448,24 @@ char *var2str(VARTYPE t){
     case VAR_STMT: return "VAR_STMT";
     case VAR_DEC: return "VAR_DEC";
     case VAR_EXPR: return "VAR_EXPR";
+    case VAR_LOGIC_OR: return "VAR_LOGIC_OR";
     case VAR_EXPR1: return "VAR_EXPR1";
+    case VAR_LOGIC_AND: return "VAR_LOGIC_AND";
     case VAR_EXPR2: return "VAR_EXPR2";
+    case VAR_CMP_NEQ: return "VAR_CMP_NEQ";
+    case VAR_CMP_EQ: return "VAR_CMP_EQ";
     case VAR_EXPR3: return "VAR_EXPR3";
+    case VAR_CMP_LT: return "VAR_CMP_LT";
+    case VAR_CMP_LEQT: return "VAR_CMP_LEQT";
+    case VAR_CMP_GT: return "VAR_CMP_GT";
+    case VAR_CMP_GEQT: return "VAR_CMP_GEQT";
     case VAR_EXPR4: return "VAR_EXPR4";
+    case VAR_MULT: return "VAR_MULT";
+    case VAR_DIV: return "VAR_DIV";
     case VAR_EXPR5: return "VAR_EXPR5";
+    case VAR_SUM: return "VAR_SUM";
+    case VAR_SUB: return "VAR_SUB";
     case VAR_EXPR6: return "VAR_EXPR6";
-    case VAR_COND1: return "VAR_COND1";
-    case VAR_COND2: return "VAR_COND2";
-    case VAR_REL1: return "VAR_REL1";
-    case VAR_REL2: return "VAR_REL2";
-    case VAR_OP1: return "VAR_OP1";
-    case VAR_OP2: return "VAR_OP2";
     case VAR_CONST: return "VAR_CONST";
     case VAR_TIPO: return "VAR_TIPO";
     default: assert(0 && "type2str: invalid value");
