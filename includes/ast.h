@@ -1,3 +1,5 @@
+#ifndef AST_H
+#define AST_H
 
 
 typedef enum {
@@ -45,11 +47,8 @@ typedef struct ASTNode {
       struct ASTNode *left;
       struct ASTNode *right;
     };
-
-
-
-
-
   };
-} ASTNode ;
+} AstNode ;
 
+extern void grammar_test(char *);
+#endif // AST_H

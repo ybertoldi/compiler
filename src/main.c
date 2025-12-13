@@ -4,9 +4,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-
 #define TOKENIZER_H_DEBUG // funcoes para printar
 #include "../includes/tokenizer.h"
+#include "../includes/ast.h"
+
 
 bool read_file(char* filename, char **buf, size_t *buf_size){
   char *ret = NULL;
@@ -39,7 +40,7 @@ bool read_file(char* filename, char **buf, size_t *buf_size){
 }
 
 void usage_ext(int ext_code){
-    printf("Usage: Compiler <src-file> [-g | -f]\n\n"
+    printf("Usage: Compiler <src-file> [-t | -g]\n\n"
            "Flags:\n"
            "   -t      print tokens\n"
            "   -g      print grammar\n");
@@ -88,10 +89,9 @@ int main(int argc, char *argv[]){
       }
     } break;
 
-    case OPT_PRINT_GRAMMAR:
-      printf("PRINT_GRAMMAR: not implemented\n");
-      break;
-
+    case OPT_PRINT_GRAMMAR:{
+      grammar_test(buf);
+    } break;
 
     case OPT_DEFAULT:
       printf("DEFAULT: not implemented\n");
