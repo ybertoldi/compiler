@@ -19,8 +19,8 @@ typedef enum {	VAR_STMTS = TKTYPE_NUM_TOKENS,
 	VAR_EXPR1,
 	VAR_LOGIC_AND,
 	VAR_EXPR2,
-	VAR_CMP_NEQ,
 	VAR_CMP_EQ,
+	VAR_CMP_NEQ,
 	VAR_EXPR3,
 	VAR_CMP_LT,
 	VAR_CMP_LEQT,
@@ -41,6 +41,6 @@ typedef enum {	VAR_STMTS = TKTYPE_NUM_TOKENS,
 
 char *var2str(VARTYPE t);
 
-extern long goto_table[70][VAR_NUM_VARS];
-extern Production rdc_table[70];
+extern long goto_table[73][VAR_NUM_VARS];
+extern Production rdc_table[73];
 #endif // GRAMMAR_H

@@ -106,8 +106,82 @@ static inline void unexpected_symbol_err(long expected) {
   exit(1);
 }
 
+
+/* vim 
+ * macro copia-cola da gramatica: 0lywl"ipwvepBiVAR_€ýa}O€ýah
+ * macro para TODO's:  /casewyw/("ehellea: €ýap} 
+ * */
 void do_reduction(Production *p){
   switch (p->target) {
+/*
+    case VAR_CMP_GT:{
+      printf("TODO: VAR_LOGIC_OR\n");
+    }break;
+
+    case VAR_LOGIC_OR:{
+      printf("TODO: VAR_LOGIC_OR\n");
+    }break;
+
+    case VAR_LOGIC_AND:{
+      printf("TODO: VAR_LOGIC_AND\n");
+      goto deflag;
+    }break;
+
+    case VAR_CMP_EQ:{
+      printf("TODO: VAR_CMP_EQ\n");
+      goto deflag;
+    }break;
+
+    case VAR_CMP_NEQ:{
+      printf("TODO: VAR_CMP_NEQ\n");
+      goto deflag;
+    }break;
+
+    case VAR_CMP_LEQT:{
+      printf("TODO: VAR_CMP_LEQT\n");
+      goto deflag;
+    }break;
+
+    case VAR_CMP_GT:{
+      printf("TODO: VAR_CMP_GT\n");
+      goto deflag;
+    }break;
+
+    case VAR_CMP_GEQT:{
+      printf("TODO: VAR_CMP_GEQT\n");
+      goto deflag;
+    }break;
+
+    case VAR_MULT:{
+      printf("TODO: VAR_MULT\n");
+      goto deflag;
+    }break;
+
+    case VAR_DIV:{
+      printf("TODO: VAR_DIV\n");
+      goto deflag;
+    }break;
+
+    case VAR_SUM:{
+      printf("TODO: VAR_SUM\n");
+      goto deflag;
+    }break;
+
+    case VAR_SUB:{
+      printf("TODO: VAR_SUB\n");
+      goto deflag;
+    }break;
+
+    case VAR_CONST:{
+      printf("TODO: VAR_CONST\n");
+      goto deflag;
+    }break;
+
+    case VAR_TIPO:{
+      printf("TODO: VAR_TIPO\n");
+      goto deflag;
+    }break;
+*/
     default: {
       for (int i = p->num_elems - 1; i >= 0; i--) {
         if (p->elements[i] != symbol_pop()) 

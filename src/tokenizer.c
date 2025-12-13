@@ -89,7 +89,7 @@ static DfaNode q64 = BUILD_DFA_NODE_FINAL(TKTYPE_TRUE); // true
 static DfaNode q66 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);   // in (i do if)
 static DfaNode q67 = BUILD_DFA_NODE_FINAL(TKTYPE_T_INT); // int
 
-static DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // c //TODO: tirar esse estado (c do case)
+//static DfaNode q68 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // c //TODO: tirar esse estado (c do case)
 static DfaNode q69 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // ch
 static DfaNode q70 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);    // cha
 static DfaNode q71 = BUILD_DFA_NODE_FINAL(TKTYPE_T_CHAR); // char
@@ -115,6 +115,10 @@ static DfaNode q86 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // fl (f do for)
 static DfaNode q87 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // flo
 static DfaNode q88 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);     // floa
 static DfaNode q89 = BUILD_DFA_NODE_FINAL(TKTYPE_T_FLOAT); // float
+
+/* STRLIT. 
+ * TODO: ajeitar essa gambiarra. So de adicionar uma coisa nova ja quebrou */
+static DfaNode q90 = BUILD_DFA_NODE_FINAL(TKTYPE_STRLIT);
 
 static int initialized = 0;
 
@@ -171,6 +175,7 @@ static void init_dfa(void){
   dfa_add_delta_expr(&q26, "_[A-Za-z]", &q26);
 
   dfa_add_delta(&q0, '=', &q27); // atribuicao
+
   /*-----NUMEROS------*/
   // int comum
   dfa_add_delta_expr(&q0, "[0-9]^0", &q29);
@@ -190,6 +195,9 @@ static void init_dfa(void){
   dfa_add_delta_expr(&q31, "ABCDEFabcdef[0-9]", &q31);
 
   dfa_add_delta(&q28, '.', &q30);
+
+  /*-----STRING LITERAL - gambiarra ------*/ 
+  dfa_add_delta(&q0, '"', &q90);
 
   /*----------------------PALAVRAS RESERVADAS-----------------------*/
   // if
@@ -232,7 +240,10 @@ static void init_dfa(void){
 
   // case
   dfa_add_delta(&q0, 'c', &q53);
-  dfa_add_delta_orelse(&q53, 'a', &q54, &q26);
+
+  dfa_add_delta(&q53, 'a', &q54);
+  dfa_add_delta_expr(&q53, "_[A-Za-z0-9]^h", &q26);
+
   dfa_add_delta_orelse(&q54, 's', &q55, &q26);
   dfa_add_delta_orelse(&q55, 'e', &q56, &q26);
   dfa_add_delta_expr(&q56, "_[A-Za-z0-9]", &q26);
@@ -257,8 +268,7 @@ static void init_dfa(void){
   dfa_add_delta_expr(&q67, "_[A-Za-z0-9]", &q26);
 
   // char
-  dfa_add_delta(&q0, 'c', &q68);
-  dfa_add_delta_orelse(&q68, 'h', &q69, &q26);
+  dfa_add_delta(&q53, 'h', &q69); // c do 'case'
   dfa_add_delta_orelse(&q69, 'a', &q70, &q26);
   dfa_add_delta_orelse(&q70, 'r', &q71, &q26);
   dfa_add_delta_expr(&q71, "_[A-Za-z0-9]", &q26);
@@ -324,11 +334,19 @@ TokenList *tokenize(char *eval){
 
   while (eval[i]) {
     int tknstart = i, n = 0;
-    while (dfa_node_move(&curnode, eval[i])) {
+    while (dfa_node_move(&curnode, eval[i])) { i++; n++; }
+
+    /*---------TODO: remover isto---------*/
+    if (curnode == &q90){
+      while (eval[i] != '"') {
+        i++; n++;
+        if (eval[i] == '\\'){ i+=2; n+=2; }
+      }
       i++;
       n++;
     }
-    
+    /*------------------------------------*/
+
     if (!curnode->is_final){
       fprintf(stderr, "ERRO: caracter nao tratado '%c' em %d\n", eval[i], i);
       exit(1);
@@ -350,7 +368,7 @@ TokenList *tokenize(char *eval){
 
 char *type2str(TKTYPE t) {
   switch (t) {
-  case TKTYPE_INIT: return "INIT";
+  case TKTYPE_INIT: return "$";
   case TKTYPE_WTSP: return "WTSP";
   case TKTYPE_OPPAREN: return "OPPAREN";
   case TKTYPE_CLPAREN: return "CLPAREN";
@@ -397,9 +415,7 @@ char *type2str(TKTYPE t) {
   case TKTYPE_T_LONG: return "T_LONG";
   case TKTYPE_T_DOUBLE: return "T_DOUBLE";
   case TKTYPE_T_FLOAT: return "T_FLOAT";
-  //TODO: adicionar string literal
-  case TKTYPE_SINGLE_QUOTE: return "SINGLE_QUOTE";
-  case TKTYPE_DOUBLE_QUOTE: return "DOUBLE_QUOTE"; //TODO: adicionar caracteres de escape 
+  case TKTYPE_STRLIT: return "STRLIT";
   default:
     fprintf(stderr, "ERRO: token nao especificado");
     exit(1);

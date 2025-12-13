@@ -68,6 +68,9 @@ typedef  enum {
   TKTYPE_T_DOUBLE,
   TKTYPE_T_FLOAT,
 
+  // STRING e CHAR
+  TKTYPE_STRLIT,
+
   // sentinela para contar o numero de tokens
   TKTYPE_NUM_TOKENS
 }TKTYPE;
