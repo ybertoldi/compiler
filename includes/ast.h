@@ -1,6 +1,10 @@
 #ifndef AST_H
 #define AST_H
 
+typedef enum {
+  ASTYPE_TERM, // tipo terminal
+  ASTYPE_BINOP
+} ASTNODE_TYPE;
 
 typedef enum {
   BNOP_SUM,
@@ -29,6 +33,9 @@ typedef enum {
 typedef struct ASTNode {
   long type;
   union {
+    // primitiva - para construir o resto
+    char *lexeme;
+        
     // int
     long ival;
 

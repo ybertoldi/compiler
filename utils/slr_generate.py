@@ -2,6 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from os import getcwd
 from os.path import isfile, relpath
+from rich import print
 import sys
 
 @dataclass
@@ -101,8 +102,9 @@ elif "-h" in sys.argv and "-c" in sys.argv:
 variables_cache: dict[str, Variable] = {}
 variables: list[Variable] = []
 grammar_symbols: list[Variable | str] = []
-for ln in bnf.splitlines():
-    if not ln: 
+
+for ln in bnf.split(";"):
+    if not ln.strip(): 
         continue
 
     p, rest = (s.strip() for s in ln.split("::="))
