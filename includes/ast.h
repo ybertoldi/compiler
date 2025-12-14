@@ -30,6 +30,7 @@ typedef enum {
   BNOP_LEQT,
 } BINOPTYPE ;
 
+
 typedef struct ASTNode {
   long type;
   union {

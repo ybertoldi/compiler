@@ -1,3 +1,4 @@
+#include <stddef.h>
 #define TOKENIZER_H_DEBUG
 #include "../includes/tokenizer.h"
 #include "../includes/grammar.h"
@@ -9,62 +10,48 @@
 
 typedef struct Symbol {
   long symbol_type;
-  AstNode node;
+  AstNode *node;
 } Symbol ;
 
-#define BUILD_BNOP(btype, lhs, rhs)                                            \
-  (AstNode) {                                                                  \
-    .type = ASTYPE_BINOP, .binop_type = btype, .left = lhs, .right = rhs       \
-  }
+static void reduce_ast(Production *p);
+static inline Symbol default_validation_get(Production *p); static inline void default_validation(Production *p);
+static inline AstNode *node_alloc();
+static inline void consume_symbol(long expected);
+static inline Symbol consume_get_symbol(long expected);
+static inline void default_validation(Production *p) ;
+static inline void unexpected_symbol_err(long expected) ;
 
-char *binopstr(long binop){
-  switch (binop) {
-    case BNOP_SUM:    return "SUM";
-    case BNOP_SUB:    return "SUB";
-    case BNOP_MULT:   return "MULT";
-    case BNOP_DIV:    return "DIV";
-    case BNOP_MOD:    return "MOD";
-    case BNOP_SHL:    return "SHL";
-    case BNOP_SHR:    return "SHR";
-    case BNOP_BW_OR:  return "BW_OR";
-    case BNOP_BW_AND: return "BW_AND";
-    case BNOP_BW_XOR: return "BW_XOR";
-    case BNOP_OR:     return "OR";
-    case BNOP_AND:    return "AND";
-    case BNOP_EQ:     return "EQ";
-    case BNOP_NEQ:    return "NEQ";
-    case BNOP_GT:     return "GT";
-    case BNOP_GEQT:   return "GEQT";
-    case BNOP_LT:     return "LT";
-    case BNOP_LEQT:   return "LEQT";
-  }
-  return "UNKOWN_BINOP";
+/*--------------------------------------------------------------------------------------*/
+/*                                       ARENA                                          */
+/*--------------------------------------------------------------------------------------*/
+// TODO: quando isso passar por um realloc, todas as referencias aos enderecos de memoria anteriores
+// vao apontar para lixo. Salvar informacoes sobre os ponteiros para resolver este problema.
+// por enquanto estou pre-alocando uma quantidade grande de memoria para nunca precisar fazer um realloc,
+// mas no futuro isso dara problemas
+struct {
+  AstNode *elems;
+  size_t capacity;
+  size_t count;
+} node_arena;
+
+static void node_arena_init(void){
+  node_arena.capacity = 1024;
+  node_arena.count = 0;
+  node_arena.elems = calloc(node_arena.capacity, sizeof(AstNode));
+
+  assert(node_arena.elems != NULL);
 }
 
-void print_ast(AstNode *n){
-  switch(n->type){
-    case ASTYPE_TERM: {
-      fputs(n->lexeme, stdout);
-    } break;
-    case ASTYPE_BINOP: {
-      printf("BNOP(%s,", binopstr(n->binop_type));
-      print_ast(n->left);
-      printf(",");
-      print_ast(n->right);
-      printf(")");
-    } break;    
-  } 
+void node_arena_free(void) { free(node_arena.elems); }
+
+static inline AstNode *node_alloc(){
+  assert(node_arena.count + 1 < node_arena.capacity); // realocacao da arena nao implementada
+  return &node_arena.elems[node_arena.count++];
 }
 
 /*--------------------------------------------------------------------------------------*/
-
-
-
-
-
-
-
-/*---------------------------------------STACKS-----------------------------------------*/
+/*                                      STACKS                                          */
+/*--------------------------------------------------------------------------------------*/
 #define STACK_SIZE 4096
 static long state_stack[STACK_SIZE];
 static long stp = 0; // state pointer
@@ -76,8 +63,14 @@ static long state_peek(void)   { assert(stp > 0);          return state_stack[st
 static Symbol symbols_stack[STACK_SIZE];
 static long syp = 0; // symbol pointer
 
-static void symbol_push_term(TokenList *t) { assert(syp < STACK_SIZE); symbols_stack[syp++] = (Symbol) {.symbol_type = t->type, (AstNode) { .type = 0, .lexeme = t->lexeme }};}
-static void symbol_push_nonterm(Symbol s)  { assert(syp < STACK_SIZE); symbols_stack[syp++] = s;}
+static void symbol_push_term(TokenList *t) {
+  assert(syp < STACK_SIZE);
+  AstNode *n = node_alloc();
+  n->type = 0;
+  n->lexeme = t->lexeme;
+  symbols_stack[syp++] = (Symbol){t->type, n};
+}
+static void symbol_push_nonterm(Symbol s)  { assert(syp < STACK_SIZE); symbols_stack[syp++] = s; }
 static Symbol symbol_pop(void)             { assert(syp > 0);          return symbols_stack[--syp]; }
 static Symbol symbol_peek(void)            { assert(syp > 0);          return symbols_stack[syp - 1]; }
 
@@ -103,12 +96,72 @@ static void printstate(long t) {
   printf("\e[175G");
   printf("INPUT = %s\n", type2str(t));
 }
+
+
 /*--------------------------------------------------------------------------------------*/
+/*                                   AST GENERATION                                     */
+/*--------------------------------------------------------------------------------------*/
+/*------------binops------------*/
+static AstNode* build_bnop(BINOPTYPE op, long exp1, long exp2, long exp3) {
+  AstNode *lhs, *rhs;
 
-static void reduce_ast(Production *p);
-static inline Symbol default_validation_get(Production *p);
-static inline void default_validation(Production *p);
+  rhs = consume_get_symbol(exp3).node;
+  consume_symbol(exp2);
+  lhs = consume_get_symbol(exp1).node;
 
+  AstNode *built_bnop = node_alloc();
+  built_bnop->type = ASTYPE_BINOP;
+  built_bnop->binop_type = op;
+  built_bnop->left = lhs;
+  built_bnop->right = rhs;
+
+  return built_bnop;
+}
+
+char *binopstr(long binop){
+  switch (binop) {
+    case BNOP_SUM:    return "SUM";
+    case BNOP_SUB:    return "SUB";
+    case BNOP_MULT:   return "MULT";
+    case BNOP_DIV:    return "DIV";
+    case BNOP_MOD:    return "MOD";
+    case BNOP_SHL:    return "SHL";
+    case BNOP_SHR:    return "SHR";
+    case BNOP_BW_OR:  return "BW_OR";
+    case BNOP_BW_AND: return "BW_AND";
+    case BNOP_BW_XOR: return "BW_XOR";
+    case BNOP_OR:     return "OR";
+    case BNOP_AND:    return "AND";
+    case BNOP_EQ:     return "EQ";
+    case BNOP_NEQ:    return "NEQ";
+    case BNOP_GT:     return "GT";
+    case BNOP_GEQT:   return "GEQT";
+    case BNOP_LT:     return "LT";
+    case BNOP_LEQT:   return "LEQT";
+  }
+  return "UNKOWN_BINOP";
+}
+
+
+void print_ast(AstNode *n){
+  switch(n->type){
+    case ASTYPE_TERM: {
+      fputs(n->lexeme, stdout);
+    } break;
+    case ASTYPE_BINOP: {
+      printf("BNOP(%s,", binopstr(n->binop_type));
+      print_ast(n->left);
+      printf(",");
+      print_ast(n->right);
+      printf(")");
+    } break;    
+  } 
+}
+
+
+/*--------------------------------------------------------------------------------------*/
+/*                                   MAIN FUNCTIONS                                     */
+/*--------------------------------------------------------------------------------------*/
 void grammar_test(char *buf){
   state_push(1);
   TokenList *tklist = tokenize(buf);
@@ -204,74 +257,75 @@ static inline Symbol default_validation_get(Production *p) {
 static void reduce_ast(Production *p){
   switch (p->target) {
     case VAR_LOG_OR:{
-      printf("TODO: VAR_LOGIC_OR\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_OR, VAR_EXPR, TKTYPE_LOGIC_OR, VAR_EXPR1);
+      Symbol s = {VAR_LOG_OR, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_LOG_AND:{
-      printf("TODO: VAR_LOGIC_AND\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_AND, VAR_EXPR1, TKTYPE_LOGIC_AND, VAR_EXPR2);
+      Symbol s = {VAR_LOG_AND, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_EQ:{
-      printf("TODO: VAR_CMP_EQ\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_EQ, VAR_EXPR2, TKTYPE_EQUALS, VAR_EXPR3);
+      Symbol s = {VAR_CMP_EQ, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_NEQ:{
-      printf("TODO: VAR_CMP_NEQ\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_NEQ, VAR_EXPR2, TKTYPE_NEQUALS, VAR_EXPR3);
+      Symbol s = {VAR_CMP_NEQ, binop_node};
+      symbol_push_nonterm(s);
+    }break;
+
+    case VAR_CMP_LT:{
+      AstNode *binop_node = build_bnop(BNOP_LT, VAR_EXPR3, TKTYPE_LT, VAR_EXPR4);
+      Symbol s = {VAR_CMP_LT, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_LEQT:{
-      printf("TODO: VAR_CMP_LEQT\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_LEQT, VAR_EXPR3, TKTYPE_LEQT, VAR_EXPR4);
+      Symbol s = {VAR_CMP_LEQT, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_GT:{
-      printf("TODO: VAR_CMP_GT\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_GT, VAR_EXPR3, TKTYPE_GT, VAR_EXPR4);
+      Symbol s = {VAR_CMP_GT, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_GEQT:{
-      printf("TODO: VAR_CMP_GEQT\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_GEQT, VAR_EXPR3, TKTYPE_GEQT, VAR_EXPR4);
+      Symbol s = {VAR_CMP_GEQT, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_MULT:{
-      AstNode *lhs, *rhs;
-      lhs = malloc(sizeof(AstNode));
-      rhs = malloc(sizeof(AstNode));
-
-      *rhs = consume_get_symbol(VAR_EXPR6).node;
-      consume_symbol(TKTYPE_MULT);
-      *lhs = consume_get_symbol(VAR_EXPR5).node;
-
-      Symbol result = {VAR_MULT, BUILD_BNOP(BNOP_MULT, lhs, rhs)};
-      symbol_push_nonterm(result);
-    }break;
+      AstNode *binop_node = build_bnop(BNOP_MULT, VAR_EXPR5, TKTYPE_MULT, VAR_EXPR6);
+      Symbol s = {VAR_MULT, binop_node};
+      symbol_push_nonterm(s);
+    } break;
 
     case VAR_DIV:{
-      printf("TODO: VAR_DIV\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_DIV, VAR_EXPR5, TKTYPE_DIV, VAR_EXPR6);
+      Symbol s = {VAR_DIV, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_SUM:{
-      AstNode *lhs, *rhs;
-      lhs = malloc(sizeof(AstNode));
-      rhs = malloc(sizeof(AstNode));
-
-      *rhs = consume_get_symbol(VAR_EXPR5).node;
-      consume_symbol(TKTYPE_SUM);
-      *lhs = consume_get_symbol(VAR_EXPR4).node;
-
-      Symbol result = {VAR_SUM, BUILD_BNOP(BNOP_SUM, lhs, rhs)};
-      symbol_push_nonterm(result);
-    }break;
+      AstNode *binop_node = build_bnop(BNOP_SUM, VAR_EXPR4, TKTYPE_SUM, VAR_EXPR5);
+      Symbol s = {VAR_SUM, binop_node};
+      symbol_push_nonterm(s);
+    } break;
 
     case VAR_SUB:{
-      printf("TODO: VAR_SUB\n");
-      default_validation(p);
+      AstNode *binop_node = build_bnop(BNOP_SUB, VAR_EXPR4, TKTYPE_SUB, VAR_EXPR5);
+      Symbol s = {VAR_SUB, binop_node};
+      symbol_push_nonterm(s);
     }break;
 
     case VAR_TIPO:{
@@ -299,17 +353,20 @@ static void reduce_ast(Production *p){
 /*--------------------DEBUG ONLY--------------------*/
 #ifdef SLR_DEBUG
 int main() {
-  printf("cur size of ast node: %d\n\n", sizeof(AstNode));
-
   char buf[BUFSIZ];
   fread(buf, sizeof(buf), sizeof(char), stdin);
+
+  node_arena_init();
   grammar_test(buf);
-  AstNode end = symbol_pop().node;
 
   printf("\n--------------------------------------------------\n");
   printf("AST:\n\n");
-  print_ast(&end);
+
+  AstNode *end = symbol_pop().node;
+  print_ast(end);
   puts("");
+
+  node_arena_free();
   return 0;
 }
 #endif //SLR_DEBUG
