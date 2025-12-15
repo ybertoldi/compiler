@@ -73,6 +73,7 @@ static void symbol_push_term(TokenList *t) {
 static void symbol_push_nonterm(Symbol s)  { assert(syp < STACK_SIZE); symbols_stack[syp++] = s; }
 static Symbol symbol_pop(void)             { assert(syp > 0);          return symbols_stack[--syp]; }
 static Symbol symbol_peek(void)            { assert(syp > 0);          return symbols_stack[syp - 1]; }
+static bool symbol_peekable(void)          { return syp > 0;}
 
 // debug stacks
 static void printstate(long t) {
@@ -102,21 +103,6 @@ static void printstate(long t) {
 /*                                   AST GENERATION                                     */
 /*--------------------------------------------------------------------------------------*/
 /*------------binops------------*/
-static AstNode* build_bnop(BINOPTYPE op, long exp1, long exp2, long exp3) {
-  AstNode *lhs, *rhs;
-
-  rhs = consume_get_symbol(exp3).node;
-  consume_symbol(exp2);
-  lhs = consume_get_symbol(exp1).node;
-
-  AstNode *built_bnop = node_alloc();
-  built_bnop->type = ASTYPE_BINOP;
-  built_bnop->binop_type = op;
-  built_bnop->left = lhs;
-  built_bnop->right = rhs;
-
-  return built_bnop;
-}
 
 char *binopstr(long binop){
   switch (binop) {
@@ -142,20 +128,83 @@ char *binopstr(long binop){
   return "UNKOWN_BINOP";
 }
 
+char *primtypestr(long primtype){
+  switch (primtype) {
+    case PTYPE_INT:    return "INT";
+    case PTYPE_CHAR:   return "CHAR";
+    case PTYPE_BOOL:   return "BOOL";
+    case PTYPE_LONG:   return "LONG";
+    case PTYPE_DOUBLE: return "DOUBLE";
+    case PTYPE_FLOAT:  return "FLOAT";
+  }
+  return "UNKOWN_TYPE";
+}
 
-void print_ast(AstNode *n){
+void print_ast_aux(AstNode *n, int stms_depth){
+#define ident() for (int tmp = 0; tmp < stms_depth; tmp++) printf("  ")
+#define ident_stmt() for (int tmp = 0; tmp < stms_depth + 1; tmp++) printf("  ")
+
   switch(n->type){
-    case ASTYPE_TERM: {
+    case ASTYPE_TERMINAL: {
       fputs(n->lexeme, stdout);
     } break;
+
     case ASTYPE_BINOP: {
       printf("BNOP(%s,", binopstr(n->binop_type));
-      print_ast(n->left);
+      print_ast_aux(n->left, stms_depth);
       printf(",");
-      print_ast(n->right);
+      print_ast_aux(n->right, stms_depth);
       printf(")");
     } break;    
+
+    case ASTYPE_DECLARATION: {
+      printf("DECLARATION(var_type=%s,varname=\"%s\",init_expr=", primtypestr(n->var_type), n->varname);
+      print_ast_aux(n->init_expr, stms_depth);
+      printf(")");
+    } break;
+
+    case ASTYPE_STMTS: {
+      printf("STMTS(\n");
+      for (int i = 0; i < n->stmt_arr.count; i++){
+        ident_stmt();
+        print_ast_aux(n->stmt_arr.elems[i], stms_depth+1);
+        printf("%s\n", (i + 1 == n->stmt_arr.count)? "" : ",");
+      }
+      ident();
+      printf(")\n");
+    } break;
+
+    case ASTYPE_WHILE: {
+      printf("WHILE(\n");
+      ident();
+      printf("w_cond=");
+      print_ast_aux(n->w_cond, stms_depth);
+      printf(",\n");
+      ident();
+      printf("w_stmts=\n");
+      ident_stmt();
+      print_ast_aux(n->w_stmts, stms_depth+1);
+      ident();
+      printf(")");
+    } break;
+
+    case ASTYPE_ASSIGN:{
+      printf("ASSIGN(assign_tgt=");
+      print_ast_aux(n->assign_tgt, stms_depth);
+      printf(",assign_expr=");
+      print_ast_aux(n->assign_expr, stms_depth);
+      printf(")");
+    } break;
+
+    case ASTTYPE_LITERAL_TYPE: {
+      assert(0 && "Unreachable");
+    } break;
+
   } 
+}
+
+void print_ast(AstNode *n){
+  print_ast_aux(n, 0);
 }
 
 
@@ -236,6 +285,22 @@ static inline Symbol consume_get_symbol(long expected){
   return s;
 }
 
+static AstNode* consume_get_bnop(BINOPTYPE op, long expct1, long expct2, long expct3) {
+  AstNode *lhs, *rhs, *ret;
+
+  rhs = consume_get_symbol(expct3).node;
+  consume_symbol(expct2);
+  lhs = consume_get_symbol(expct1).node;
+
+  ret = node_alloc();
+  ret->type = ASTYPE_BINOP;
+  ret->binop_type = op;
+  ret->left = lhs;
+  ret->right = rhs;
+
+  return ret;
+}
+
 static inline void default_validation(Production *p) {
   for (int i = p->num_elems - 1; i >= 0; i--) consume_symbol(p->elements[i]);
 }
@@ -253,84 +318,80 @@ static inline Symbol default_validation_get(Production *p) {
   return ret;
 }
 
+
 // Constroi a arvore de sintaxe abstrata na hora de fazer as reducoes.
 static void reduce_ast(Production *p){
   switch (p->target) {
     case VAR_LOG_OR:{
-      AstNode *binop_node = build_bnop(BNOP_OR, VAR_EXPR, TKTYPE_LOGIC_OR, VAR_EXPR1);
+      AstNode *binop_node = consume_get_bnop(BNOP_OR, VAR_EXPR, TKTYPE_LOGIC_OR, VAR_EXPR1);
       Symbol s = {VAR_LOG_OR, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_LOG_AND:{
-      AstNode *binop_node = build_bnop(BNOP_AND, VAR_EXPR1, TKTYPE_LOGIC_AND, VAR_EXPR2);
+      AstNode *binop_node = consume_get_bnop(BNOP_AND, VAR_EXPR1, TKTYPE_LOGIC_AND, VAR_EXPR2);
       Symbol s = {VAR_LOG_AND, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_EQ:{
-      AstNode *binop_node = build_bnop(BNOP_EQ, VAR_EXPR2, TKTYPE_EQUALS, VAR_EXPR3);
+      AstNode *binop_node = consume_get_bnop(BNOP_EQ, VAR_EXPR2, TKTYPE_EQUALS, VAR_EXPR3);
       Symbol s = {VAR_CMP_EQ, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_NEQ:{
-      AstNode *binop_node = build_bnop(BNOP_NEQ, VAR_EXPR2, TKTYPE_NEQUALS, VAR_EXPR3);
+      AstNode *binop_node = consume_get_bnop(BNOP_NEQ, VAR_EXPR2, TKTYPE_NEQUALS, VAR_EXPR3);
       Symbol s = {VAR_CMP_NEQ, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_LT:{
-      AstNode *binop_node = build_bnop(BNOP_LT, VAR_EXPR3, TKTYPE_LT, VAR_EXPR4);
+      AstNode *binop_node = consume_get_bnop(BNOP_LT, VAR_EXPR3, TKTYPE_LT, VAR_EXPR4);
       Symbol s = {VAR_CMP_LT, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_LEQT:{
-      AstNode *binop_node = build_bnop(BNOP_LEQT, VAR_EXPR3, TKTYPE_LEQT, VAR_EXPR4);
+      AstNode *binop_node = consume_get_bnop(BNOP_LEQT, VAR_EXPR3, TKTYPE_LEQT, VAR_EXPR4);
       Symbol s = {VAR_CMP_LEQT, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_GT:{
-      AstNode *binop_node = build_bnop(BNOP_GT, VAR_EXPR3, TKTYPE_GT, VAR_EXPR4);
+      AstNode *binop_node = consume_get_bnop(BNOP_GT, VAR_EXPR3, TKTYPE_GT, VAR_EXPR4);
       Symbol s = {VAR_CMP_GT, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_CMP_GEQT:{
-      AstNode *binop_node = build_bnop(BNOP_GEQT, VAR_EXPR3, TKTYPE_GEQT, VAR_EXPR4);
+      AstNode *binop_node = consume_get_bnop(BNOP_GEQT, VAR_EXPR3, TKTYPE_GEQT, VAR_EXPR4);
       Symbol s = {VAR_CMP_GEQT, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_MULT:{
-      AstNode *binop_node = build_bnop(BNOP_MULT, VAR_EXPR5, TKTYPE_MULT, VAR_EXPR6);
+      AstNode *binop_node = consume_get_bnop(BNOP_MULT, VAR_EXPR5, TKTYPE_MULT, VAR_EXPR6);
       Symbol s = {VAR_MULT, binop_node};
       symbol_push_nonterm(s);
     } break;
 
     case VAR_DIV:{
-      AstNode *binop_node = build_bnop(BNOP_DIV, VAR_EXPR5, TKTYPE_DIV, VAR_EXPR6);
+      AstNode *binop_node = consume_get_bnop(BNOP_DIV, VAR_EXPR5, TKTYPE_DIV, VAR_EXPR6);
       Symbol s = {VAR_DIV, binop_node};
       symbol_push_nonterm(s);
     }break;
 
     case VAR_SUM:{
-      AstNode *binop_node = build_bnop(BNOP_SUM, VAR_EXPR4, TKTYPE_SUM, VAR_EXPR5);
+      AstNode *binop_node = consume_get_bnop(BNOP_SUM, VAR_EXPR4, TKTYPE_SUM, VAR_EXPR5);
       Symbol s = {VAR_SUM, binop_node};
       symbol_push_nonterm(s);
     } break;
 
     case VAR_SUB:{
-      AstNode *binop_node = build_bnop(BNOP_SUB, VAR_EXPR4, TKTYPE_SUB, VAR_EXPR5);
+      AstNode *binop_node = consume_get_bnop(BNOP_SUB, VAR_EXPR4, TKTYPE_SUB, VAR_EXPR5);
       Symbol s = {VAR_SUB, binop_node};
       symbol_push_nonterm(s);
-    }break;
-
-    case VAR_TIPO:{
-      printf("TODO: VAR_TIPO\n");
-      default_validation(p);
     }break;
 
     case VAR_PAREN_EXPR:{
@@ -339,6 +400,81 @@ static void reduce_ast(Production *p){
       consume_symbol(TKTYPE_OPPAREN);
 
       symbol_push_nonterm((Symbol) {.symbol_type = p->target, .node = s.node});
+    } break;
+
+    case VAR_TIPO:{
+      Symbol s = consume_get_symbol(p->elements[0]);
+
+      s.node->type = ASTTYPE_LITERAL_TYPE;
+      s.node->literal_type = s.symbol_type;
+      s.symbol_type = VAR_TIPO;
+
+      symbol_push_nonterm(s);
+    }break;
+
+    case VAR_DEC: {
+      AstNode *dec = node_alloc();
+      dec->type = ASTYPE_DECLARATION;
+
+      consume_symbol(TKTYPE_SMCOLON);
+      dec->init_expr = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_ATTRIBUTION); 
+      dec->varname = consume_get_symbol(TKTYPE_VAR).node->lexeme; 
+      dec->var_type = consume_get_symbol(VAR_TIPO).node->literal_type;
+      
+      Symbol s = {VAR_DEC, dec};
+      symbol_push_nonterm(s);
+    } break;
+
+    case VAR_STMTS: {
+      Symbol s = consume_get_symbol(VAR_STMT);
+      if (symbol_peekable() && symbol_peek().symbol_type == VAR_STMTS){
+        Symbol prev = symbol_pop();
+        DA_APPEND(prev.node->stmt_arr, s.node);
+        symbol_push_nonterm(prev);
+      } else {
+        AstNode *n = node_alloc();
+        n->type = ASTYPE_STMTS;
+
+        n->stmt_arr.capacity = 16;
+        n->stmt_arr.elems = calloc(16, sizeof(void *));
+        n->stmt_arr.count = 0;
+        DA_APPEND(n->stmt_arr, s.node);
+
+        s.node = n;
+        s.symbol_type = VAR_STMTS;
+        symbol_push_nonterm(s);
+      }
+    } break;
+    
+    case VAR_WHILE: {
+      AstNode *n = node_alloc();
+      n->type = ASTYPE_WHILE;
+
+      consume_symbol(TKTYPE_CLBRACKET);
+      n->w_stmts = consume_get_symbol(VAR_STMTS).node;
+      consume_symbol(TKTYPE_OPBRACKET);
+      consume_symbol(TKTYPE_CLPAREN);
+      n->w_cond = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_OPPAREN);
+      consume_symbol(TKTYPE_WHILE);
+
+      Symbol s = {VAR_WHILE, n};
+      symbol_push_nonterm(s);
+    } break;
+
+
+    case VAR_ASSIGN: {
+      AstNode *n = node_alloc();
+      n->type = ASTYPE_ASSIGN;
+      
+      consume_symbol(TKTYPE_SMCOLON);
+      n->assign_expr = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_ATTRIBUTION);
+      n->assign_tgt = consume_get_symbol(TKTYPE_VAR).node;
+
+      Symbol s = {VAR_ASSIGN, n};
+      symbol_push_nonterm(s);
     } break;
 
     default: {

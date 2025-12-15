@@ -1,10 +1,29 @@
 #ifndef AST_H
 #define AST_H
+#include "tokenizer.h"
+#include "dynamic_array.h"
+#include <stddef.h>
+#include <stdint.h>
 
 typedef enum {
-  ASTYPE_TERM, // tipo terminal
-  ASTYPE_BINOP
-} ASTNODE_TYPE;
+  ASTYPE_TERMINAL, 
+  ASTYPE_BINOP,
+  ASTTYPE_LITERAL_TYPE,
+  ASTYPE_DECLARATION,
+  ASTYPE_STMTS,
+  ASTYPE_WHILE,
+  ASTYPE_ASSIGN
+} AstNodeType;
+
+
+typedef enum{
+  PTYPE_INT = TKTYPE_T_INT,
+  PTYPE_CHAR,
+  PTYPE_BOOL,
+  PTYPE_LONG,
+  PTYPE_DOUBLE,
+  PTYPE_FLOAT,
+} PrimType;
 
 typedef enum {
   BNOP_SUM,
@@ -31,30 +50,50 @@ typedef enum {
 } BINOPTYPE ;
 
 
-typedef struct ASTNode {
-  long type;
-  union {
-    // primitiva - para construir o resto
-    char *lexeme;
-        
-    // int
-    long ival;
+typedef struct AstNode {
+  AstNodeType type;
 
-    // float/double
+  union {
+/*---nós primitivos---*/
+    char *lexeme; // terminal
+    char *sval;   // string
+    long ival;    // inteiro
     struct {
       double fval;
       char *frepr;
-    };
+    };  // float ou double
     
-    // str
-    char *sval;
-
-    // binary op
+/*---nós derivados---*/
+    PrimType literal_type; // tipo literal
+    
     struct {
       BINOPTYPE binop_type;
-      struct ASTNode *left;
-      struct ASTNode *right;
-    };
+      struct AstNode *left;
+      struct AstNode *right;
+    }; // operacao binaria
+
+    struct {
+      PrimType var_type;
+      char *varname;
+      struct AstNode *init_expr;
+    }; // declaracao
+  
+    struct{
+      struct AstNode **elems;
+      size_t           count;
+      size_t           capacity;
+    } stmt_arr; // array de stmts
+
+    struct {
+      struct AstNode *w_cond;
+      struct AstNode *w_stmts;
+    }; // while
+    
+    struct {
+      struct AstNode *assign_tgt;
+      struct AstNode *assign_expr;
+    }; // atribuicao
+    
   };
 } AstNode ;
 
