@@ -1,6 +1,6 @@
 .PHONY: test_compiler test_slr
 
-CFLAGS=  -O3 -g -Wall -Wextra 
+CFLAGS=  -O1 -g -Wall -Wextra 
 LIB_COMMON= lib/dfa_node.o lib/hashmap.o lib/tokenizer.o
 
 Compiler: src/main.c $(LIB_COMMON) lib/slr.o lib/slr_tables.o

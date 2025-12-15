@@ -12,7 +12,8 @@ typedef enum {
   ASTYPE_DECLARATION,
   ASTYPE_STMTS,
   ASTYPE_WHILE,
-  ASTYPE_ASSIGN
+  ASTYPE_ASSIGN,
+  ASTYPE_IF
 } AstNodeType;
 
 
@@ -93,6 +94,12 @@ typedef struct AstNode {
       struct AstNode *assign_tgt;
       struct AstNode *assign_expr;
     }; // atribuicao
+
+    struct {
+      struct AstNode *if_cond;
+      struct AstNode *if_stmts;
+      struct AstNode *else_stmts;
+    }; // if-else
     
   };
 } AstNode ;

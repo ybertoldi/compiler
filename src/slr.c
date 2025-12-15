@@ -13,6 +13,8 @@ typedef struct Symbol {
   AstNode *node;
 } Symbol ;
 
+
+
 static void reduce_ast(Production *p);
 static inline Symbol default_validation_get(Production *p); static inline void default_validation(Production *p);
 static inline AstNode *node_alloc();
@@ -193,6 +195,22 @@ void print_ast_aux(AstNode *n, int stms_depth){
       print_ast_aux(n->assign_tgt, stms_depth);
       printf(",assign_expr=");
       print_ast_aux(n->assign_expr, stms_depth);
+      printf(")");
+    } break;
+
+    case ASTYPE_IF: {
+      printf("IF(if_cond=");
+      print_ast_aux(n->if_cond, stms_depth);
+      printf(",if_stmts=\n");
+      ident_stmt();
+      print_ast_aux(n->if_stmts,stms_depth + 1);
+      if (n->else_stmts != NULL){
+        printf(",else_stmts=\n");
+        ident_stmt();
+        print_ast_aux(n->else_stmts, stms_depth+1);
+      }
+      
+      ident();
       printf(")");
     } break;
 
@@ -474,6 +492,22 @@ static void reduce_ast(Production *p){
       n->assign_tgt = consume_get_symbol(TKTYPE_VAR).node;
 
       Symbol s = {VAR_ASSIGN, n};
+      symbol_push_nonterm(s);
+    } break;
+
+    case VAR_IF: {
+      AstNode *n = node_alloc();
+      n->type = ASTYPE_IF;
+      consume_symbol(TKTYPE_CLBRACKET);
+      n->if_stmts = consume_get_symbol(VAR_STMTS).node;
+      consume_symbol(TKTYPE_OPBRACKET);
+      consume_symbol(TKTYPE_CLPAREN);
+      n->if_cond = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_OPPAREN);
+      consume_symbol(TKTYPE_IF);
+      n->else_stmts = NULL;
+
+      Symbol s = {VAR_IF, n};
       symbol_push_nonterm(s);
     } break;
 

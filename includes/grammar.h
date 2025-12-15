@@ -14,6 +14,9 @@ typedef struct {
 typedef enum {	VAR_STMTS = TKTYPE_NUM_TOKENS,
 	VAR_STMT,
 	VAR_WHILE,
+	VAR_IF,
+	VAR_IF_ELSE,
+	VAR_ELSE,
 	VAR_DEC,
 	VAR_ASSIGN,
 	VAR_EXPR,
@@ -44,6 +47,6 @@ typedef enum {	VAR_STMTS = TKTYPE_NUM_TOKENS,
 
 char *var2str(VARTYPE t);
 
-extern long goto_table[87][VAR_NUM_VARS];
-extern Production rdc_table[87];
+extern long goto_table[102][VAR_NUM_VARS];
+extern Production rdc_table[102];
 #endif // GRAMMAR_H
