@@ -1,0 +1,15 @@
+int x = 50;
+bool y = false;
+double z = 0.125 * x;
+long i = 0;
+
+while (y == false){
+  z = 2 * z;
+  i = i + 1;
+  if (z >= x){
+    y = true;
+  } 
+}
+
+printf("valor de i = %d", i);
+exit(0);

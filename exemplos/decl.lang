@@ -1,0 +1,3 @@
+int x = 20 + 5;
+int y = x -2;
+double z = sqrt(y);

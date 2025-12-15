@@ -13,7 +13,9 @@ typedef enum {
   ASTYPE_STMTS,
   ASTYPE_WHILE,
   ASTYPE_ASSIGN,
-  ASTYPE_IF
+  ASTYPE_IF,
+  ASTYPE_FUNCALL1,
+  ASTYPE_FUNCALL2
 } AstNodeType;
 
 
@@ -48,7 +50,7 @@ typedef enum {
   BNOP_GEQT,
   BNOP_LT,
   BNOP_LEQT,
-} BINOPTYPE ;
+} BinopType ;
 
 
 typedef struct AstNode {
@@ -65,10 +67,10 @@ typedef struct AstNode {
     };  // float ou double
     
 /*---nós derivados---*/
-    PrimType literal_type; // tipo literal
+    PrimType literal_type; // tipo literal(char,double,long, etc.)
     
     struct {
-      BINOPTYPE binop_type;
+      BinopType binop_type;
       struct AstNode *left;
       struct AstNode *right;
     }; // operacao binaria
@@ -100,6 +102,12 @@ typedef struct AstNode {
       struct AstNode *if_stmts;
       struct AstNode *else_stmts;
     }; // if-else
+    
+    struct{
+      char *func_name;
+      struct AstNode* arg1;
+      struct AstNode* arg2;
+    }; // func-call
     
   };
 } AstNode ;

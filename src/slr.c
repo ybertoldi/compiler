@@ -22,6 +22,7 @@ static inline void consume_symbol(long expected);
 static inline Symbol consume_get_symbol(long expected);
 static inline void default_validation(Production *p) ;
 static inline void unexpected_symbol_err(long expected) ;
+static inline void default_reduction(Production *p);
 
 /*--------------------------------------------------------------------------------------*/
 /*                                       ARENA                                          */
@@ -152,7 +153,7 @@ void print_ast_aux(AstNode *n, int stms_depth){
     } break;
 
     case ASTYPE_BINOP: {
-      printf("BNOP(%s,", binopstr(n->binop_type));
+      printf("%s(", binopstr(n->binop_type));
       print_ast_aux(n->left, stms_depth);
       printf(",");
       print_ast_aux(n->right, stms_depth);
@@ -214,6 +215,20 @@ void print_ast_aux(AstNode *n, int stms_depth){
       printf(")");
     } break;
 
+    case ASTYPE_FUNCALL1: {
+      printf("CALL(func_name=\"%s\", arg1=", n->func_name);
+      print_ast_aux(n->arg1, stms_depth);
+      printf(")");
+    } break;
+
+    case ASTYPE_FUNCALL2: {
+      printf("CALL(func_name=\"%s\", arg1=", n->func_name);
+      print_ast_aux(n->arg1, stms_depth);
+      printf(",arg2=");
+      print_ast_aux(n->arg2, stms_depth);
+      printf(")");
+    } break;
+
     case ASTTYPE_LITERAL_TYPE: {
       assert(0 && "Unreachable");
     } break;
@@ -230,6 +245,7 @@ void print_ast(AstNode *n){
 /*                                   MAIN FUNCTIONS                                     */
 /*--------------------------------------------------------------------------------------*/
 void grammar_test(char *buf){
+  node_arena_init();
   state_push(1);
   TokenList *tklist = tokenize(buf);
   enum {PARSING_TOKENS, PARSING_EOF} parse_state = PARSING_TOKENS;
@@ -241,7 +257,7 @@ void grammar_test(char *buf){
     else
       printstate(0);
 
-    if (parse_state == PARSING_TOKENS && tklist && (gt_state = goto_table[state_peek()][tklist->type]) != 0) {
+    if (parse_state == PARSING_TOKENS && (gt_state = goto_table[state_peek()][tklist->type]) != 0) {
       symbol_push_term(tklist);
       state_push(gt_state);
       tklist = tklist->next;
@@ -260,7 +276,7 @@ void grammar_test(char *buf){
 #ifdef SLR_DEBUG
       reduce_ast(&p);
 #else
-      default_validation(&p);
+      default_reduction(&p);
 #endif //SLR_DEBUG
       if ((gt_state = goto_table[state_peek()][p.target]) != 0) {
         state_push(gt_state);
@@ -303,7 +319,7 @@ static inline Symbol consume_get_symbol(long expected){
   return s;
 }
 
-static AstNode* consume_get_bnop(BINOPTYPE op, long expct1, long expct2, long expct3) {
+static AstNode* consume_get_bnop(BinopType op, long expct1, long expct2, long expct3) {
   AstNode *lhs, *rhs, *ret;
 
   rhs = consume_get_symbol(expct3).node;
@@ -321,6 +337,12 @@ static AstNode* consume_get_bnop(BINOPTYPE op, long expct1, long expct2, long ex
 
 static inline void default_validation(Production *p) {
   for (int i = p->num_elems - 1; i >= 0; i--) consume_symbol(p->elements[i]);
+}
+
+static inline void default_reduction(Production *p) {
+  for (int i = p->num_elems - 1; i >= 0; i--) consume_symbol(p->elements[i]);
+  Symbol s = {p->target, NULL};
+  symbol_push_nonterm(s);
 }
 
 // consome toda a producao e retorna o ultimo elemento consumido
@@ -511,6 +533,32 @@ static void reduce_ast(Production *p){
       symbol_push_nonterm(s);
     } break;
 
+    case VAR_FUNC_CALL1: {
+      AstNode *n = node_alloc();
+      n->type = ASTYPE_FUNCALL1;
+      consume_symbol(TKTYPE_CLPAREN);
+      n->arg1 = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_OPPAREN);
+      n->func_name = consume_get_symbol(TKTYPE_VAR).node->lexeme;
+
+      Symbol s = {VAR_FUNC_CALL1, n};
+      symbol_push_nonterm(s);
+    } break;
+
+    case VAR_FUNC_CALL2: {
+      AstNode *n = node_alloc();
+      n->type = ASTYPE_FUNCALL2;
+      consume_symbol(TKTYPE_CLPAREN);
+      n->arg2 = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_COMMA);
+      n->arg1 = consume_get_symbol(VAR_EXPR).node;
+      consume_symbol(TKTYPE_OPPAREN);
+      n->func_name = consume_get_symbol(TKTYPE_VAR).node->lexeme;
+
+      Symbol s = {VAR_FUNC_CALL2, n};
+      symbol_push_nonterm(s);
+    } break;
+
     default: {
       // gambiarra
       Symbol last = default_validation_get(p);
@@ -526,7 +574,6 @@ int main() {
   char buf[BUFSIZ];
   fread(buf, sizeof(buf), sizeof(char), stdin);
 
-  node_arena_init();
   grammar_test(buf);
 
   printf("\n--------------------------------------------------\n");
