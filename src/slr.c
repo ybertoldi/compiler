@@ -31,25 +31,48 @@ static inline void default_reduction(Production *p);
 // vao apontar para lixo. Salvar informacoes sobre os ponteiros para resolver este problema.
 // por enquanto estou pre-alocando uma quantidade grande de memoria para nunca precisar fazer um realloc,
 // mas no futuro isso dara problemas
-struct {
+typedef struct NodeArena {
   AstNode *elems;
   size_t capacity;
   size_t count;
-} node_arena;
+  struct NodeArena *next;
+} NodeArena;
+
+NodeArena *arena_head, *arena_cur;
 
 static void node_arena_init(void){
-  node_arena.capacity = 1024;
-  node_arena.count = 0;
-  node_arena.elems = calloc(node_arena.capacity, sizeof(AstNode));
+  arena_head = malloc(sizeof(struct NodeArena));
 
-  assert(node_arena.elems != NULL);
+  arena_head->capacity = 1024;
+  arena_head->count = 0;
+  arena_head->elems = calloc(arena_head->capacity, sizeof(AstNode));
+  arena_head->next = NULL;
+  
+  arena_cur = arena_head;
+  assert(arena_cur->elems != NULL);
 }
 
-void node_arena_free(void) { free(node_arena.elems); }
+void node_arena_free(void) {
+  NodeArena *cur = arena_head;
+  while (cur){
+    NodeArena *tmp = cur;
+    free(cur->elems);
+    cur = cur->next;
+    free(tmp);
+  }
+}
 
 static inline AstNode *node_alloc(){
-  assert(node_arena.count + 1 < node_arena.capacity); // realocacao da arena nao implementada
-  return &node_arena.elems[node_arena.count++];
+  if (arena_cur->count + 1 >= arena_cur->capacity){
+    arena_cur->next = malloc(sizeof(struct NodeArena));
+    arena_cur->next->capacity = 1024;
+    arena_cur->next->count = 0;
+    arena_cur->next->elems = calloc(1024, sizeof(struct AstNode));
+
+    arena_cur = arena_cur->next;
+    arena_cur->next = NULL;
+  }
+  return &arena_cur->elems[arena_cur->count++];
 }
 
 /*--------------------------------------------------------------------------------------*/
@@ -215,17 +238,13 @@ void print_ast_aux(AstNode *n, int stms_depth){
       printf(")");
     } break;
 
-    case ASTYPE_FUNCALL1: {
-      printf("CALL(func_name=\"%s\", arg1=", n->func_name);
-      print_ast_aux(n->arg1, stms_depth);
-      printf(")");
-    } break;
-
-    case ASTYPE_FUNCALL2: {
-      printf("CALL(func_name=\"%s\", arg1=", n->func_name);
-      print_ast_aux(n->arg1, stms_depth);
-      printf(",arg2=");
-      print_ast_aux(n->arg2, stms_depth);
+    case ASTYPE_FUNCALL: {
+      printf("CALL(func_name=\"%s\",", n->func_name);
+      for (int i = 0; i < n->args.count; i++){
+        printf("arg%d=", i);
+        print_ast_aux(n->args.elems[i], stms_depth);
+        if (i + 1 < n->args.count) printf(",");
+      }
       printf(")");
     } break;
 
@@ -533,32 +552,45 @@ static void reduce_ast(Production *p){
       symbol_push_nonterm(s);
     } break;
 
-    case VAR_FUNC_CALL1: {
-      AstNode *n = node_alloc();
-      n->type = ASTYPE_FUNCALL1;
+    case VAR_FUNC_CALL: {
+      AstNode *n;
       consume_symbol(TKTYPE_CLPAREN);
-      n->arg1 = consume_get_symbol(VAR_EXPR).node;
+      n = consume_get_symbol(VAR_ARGS).node;
       consume_symbol(TKTYPE_OPPAREN);
       n->func_name = consume_get_symbol(TKTYPE_VAR).node->lexeme;
 
-      Symbol s = {VAR_FUNC_CALL1, n};
+      n->type = ASTYPE_FUNCALL;
+      Symbol s = {VAR_FUNC_CALL, n};
       symbol_push_nonterm(s);
     } break;
+  
+    case VAR_ARGS: {
+      // <ARGS> ::= <EXPR>;
+      if (p->num_elems == 1){ 
+        Symbol s = consume_get_symbol(VAR_EXPR);
 
-    case VAR_FUNC_CALL2: {
-      AstNode *n = node_alloc();
-      n->type = ASTYPE_FUNCALL2;
-      consume_symbol(TKTYPE_CLPAREN);
-      n->arg2 = consume_get_symbol(VAR_EXPR).node;
-      consume_symbol(TKTYPE_COMMA);
-      n->arg1 = consume_get_symbol(VAR_EXPR).node;
-      consume_symbol(TKTYPE_OPPAREN);
-      n->func_name = consume_get_symbol(TKTYPE_VAR).node->lexeme;
+        AstNode *n = node_alloc();        
+        n->type = ASTYPE_FUNCARGS;
+        n->args.elems = calloc(16, sizeof(AstNode*));
+        n->args.count = 1;
+        n->args.capacity = 16;
+        n->args.elems[0] = s.node;
 
-      Symbol s = {VAR_FUNC_CALL2, n};
-      symbol_push_nonterm(s);
+        s.node = n;
+        s.symbol_type = VAR_ARGS;
+        symbol_push_nonterm(s);
+      } 
+      // <ARGS> ::= <ARGS> TKTYPE_COMMA <EXPR>;
+      else {
+        AstNode *expr = consume_get_symbol(VAR_EXPR).node;
+        consume_symbol(TKTYPE_COMMA);
+        Symbol s = consume_get_symbol(VAR_ARGS);
+
+        DA_APPEND(s.node->args, expr);
+        symbol_push_nonterm(s);
+      }
     } break;
-
+    
     default: {
       // gambiarra
       Symbol last = default_validation_get(p);

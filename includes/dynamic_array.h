@@ -5,6 +5,13 @@
 
 // macros par arrays dinamicos
 
+#define DynamicArray(type)                                                     \
+  struct {                                                                     \
+    type *elems;                                                               \
+    size_t count;                                                              \
+    size_t capacity;                                                           \
+  }
+
 #define DA_APPEND(arr, value)                                                  \
   do {                                                                         \
     if (arr.count >= arr.capacity) {                                           \

@@ -14,8 +14,8 @@ typedef enum {
   ASTYPE_WHILE,
   ASTYPE_ASSIGN,
   ASTYPE_IF,
-  ASTYPE_FUNCALL1,
-  ASTYPE_FUNCALL2
+  ASTYPE_FUNCARGS,
+  ASTYPE_FUNCALL
 } AstNodeType;
 
 
@@ -68,7 +68,8 @@ typedef struct AstNode {
     
 /*---nós derivados---*/
     PrimType literal_type; // tipo literal(char,double,long, etc.)
-    
+    DynamicArray(struct AstNode*) stmt_arr; // array de stmts
+
     struct {
       BinopType binop_type;
       struct AstNode *left;
@@ -81,11 +82,6 @@ typedef struct AstNode {
       struct AstNode *init_expr;
     }; // declaracao
   
-    struct{
-      struct AstNode **elems;
-      size_t           count;
-      size_t           capacity;
-    } stmt_arr; // array de stmts
 
     struct {
       struct AstNode *w_cond;
@@ -104,9 +100,8 @@ typedef struct AstNode {
     }; // if-else
     
     struct{
-      char *func_name;
-      struct AstNode* arg1;
-      struct AstNode* arg2;
+       char *func_name;
+       DynamicArray(struct AstNode *) args;
     }; // func-call
     
   };
