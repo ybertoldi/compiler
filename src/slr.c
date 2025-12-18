@@ -27,10 +27,6 @@ static inline void default_reduction(Production *p);
 /*--------------------------------------------------------------------------------------*/
 /*                                       ARENA                                          */
 /*--------------------------------------------------------------------------------------*/
-// TODO: quando isso passar por um realloc, todas as referencias aos enderecos de memoria anteriores
-// vao apontar para lixo. Salvar informacoes sobre os ponteiros para resolver este problema.
-// por enquanto estou pre-alocando uma quantidade grande de memoria para nunca precisar fazer um realloc,
-// mas no futuro isso dara problemas
 typedef struct NodeArena {
   AstNode *elems;
   size_t capacity;
@@ -454,11 +450,13 @@ static void reduce_ast(Production *p){
     }break;
 
     case VAR_PAREN_EXPR:{
+      Symbol s;
       consume_symbol(TKTYPE_CLPAREN);
-      Symbol s = consume_get_symbol(VAR_EXPR);
+      s = consume_get_symbol(VAR_EXPR);
       consume_symbol(TKTYPE_OPPAREN);
 
-      symbol_push_nonterm((Symbol) {.symbol_type = p->target, .node = s.node});
+      s.symbol_type = VAR_PAREN_EXPR;
+      symbol_push_nonterm(s);
     } break;
 
     case VAR_TIPO:{
@@ -516,7 +514,7 @@ static void reduce_ast(Production *p){
       consume_symbol(TKTYPE_CLPAREN);
       n->w_cond = consume_get_symbol(VAR_EXPR).node;
       consume_symbol(TKTYPE_OPPAREN);
-      consume_symbol(TKTYPE_WHILE);
+      consume_symbol(TKTYPE_KW_WHILE);
 
       Symbol s = {VAR_WHILE, n};
       symbol_push_nonterm(s);
@@ -545,7 +543,7 @@ static void reduce_ast(Production *p){
       consume_symbol(TKTYPE_CLPAREN);
       n->if_cond = consume_get_symbol(VAR_EXPR).node;
       consume_symbol(TKTYPE_OPPAREN);
-      consume_symbol(TKTYPE_IF);
+      consume_symbol(TKTYPE_KW_IF);
       n->else_stmts = NULL;
 
       Symbol s = {VAR_IF, n};
@@ -593,8 +591,9 @@ static void reduce_ast(Production *p){
     
     default: {
       // gambiarra
-      Symbol last = default_validation_get(p);
-      symbol_push_nonterm((Symbol) {.symbol_type = p->target, .node = last.node});
+      Symbol s = default_validation_get(p);
+      s.symbol_type = p->target;
+      symbol_push_nonterm(s);
     } break;
   }
 }

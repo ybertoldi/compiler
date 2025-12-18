@@ -51,42 +51,47 @@ typedef  enum {
   TKTYPE_OCTALINT,
 
   //PALAVRAS RESERVADAS
-  TKTYPE_IF,
-  TKTYPE_ELSE,
-  TKTYPE_FOR,
-  TKTYPE_WHILE,
-  TKTYPE_SWITCH,
-  TKTYPE_CASE,
-  TKTYPE_FALSE,
-  TKTYPE_TRUE,
+  TKTYPE_KW_IF,
+  TKTYPE_KW_ELSE,
+
+  TKTYPE_KW_FOR,
+  TKTYPE_KW_WHILE,
+  TKTYPE_KW_BREAK,
+  TKTYPE_KW_CONTINUE,
+
+  TKTYPE_KW_SWITCH,
+  TKTYPE_KW_CASE,
+  TKTYPE_KW_FALSE,
+  TKTYPE_KW_TRUE,
 
   //PALAVRAS RESERVADAS, TIPOS
-  TKTYPE_T_INT,
-  TKTYPE_T_CHAR,
-  TKTYPE_T_BOOL,
-  TKTYPE_T_LONG,
-  TKTYPE_T_DOUBLE,
-  TKTYPE_T_FLOAT,
+  TKTYPE_KW_INT,
+  TKTYPE_KW_CHAR,
+  TKTYPE_KW_BOOL,
+  TKTYPE_KW_LONG,
+  TKTYPE_KW_DOUBLE,
+  TKTYPE_KW_FLOAT,
+  TKTYPE_KW_VOID,
 
   // STRING e CHAR
   TKTYPE_STRLIT,
 
   // sentinela para contar o numero de tokens
   TKTYPE_NUM_TOKENS
-}TKTYPE;
+}TokenType;
 
 
 // STRUCTS
 typedef struct tk{
   char *lexeme;
-  TKTYPE type;
+  TokenType type;
   struct tk *next;
 } TokenList;
 
 
 // FUNCOES
 TokenList *tokenize(char *eval);
-char *type2str(TKTYPE t);
+char *type2str(TokenType t);
 
 // macros para printar
 #ifdef TOKENIZER_H_DEBUG

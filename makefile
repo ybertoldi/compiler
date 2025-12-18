@@ -1,6 +1,6 @@
 .PHONY: test_compiler test_slr
 
-CFLAGS= -O2 -g -Wall -Wextra 
+CFLAGS= -g -Wall -Wextra 
 LIB_COMMON= lib/dfa_node.o lib/hashmap.o lib/tokenizer.o
 
 Compiler: src/main.c $(LIB_COMMON) lib/slr.o lib/slr_tables.o
@@ -14,7 +14,6 @@ lib/slr_tables.o: src/slr_tables.c includes/grammar.h lib/tokenizer.o
 
 includes/grammar.h src/slr_tables.c: gramatica.bnf utils/slr_generate.py
 	python3 utils/slr_generate.py gramatica.bnf -h includes/grammar.h -c src/slr_tables.c
-
 
 
 lib/hashmap.o: src/hashmap.c

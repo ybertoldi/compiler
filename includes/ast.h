@@ -20,7 +20,7 @@ typedef enum {
 
 
 typedef enum{
-  PTYPE_INT = TKTYPE_T_INT,
+  PTYPE_INT = TKTYPE_KW_INT,
   PTYPE_CHAR,
   PTYPE_BOOL,
   PTYPE_LONG,
