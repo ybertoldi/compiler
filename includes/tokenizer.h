@@ -43,7 +43,7 @@ typedef  enum {
   TKTYPE_NEGATION, //negacao em bitwise e negacao logica sao iguais
                    
   //VARIAVEIS E NUMS
-  TKTYPE_VAR,
+  TKTYPE_NAME,
   TKTYPE_ATTRIBUTION,
   TKTYPE_INT,
   TKTYPE_FLOAT,

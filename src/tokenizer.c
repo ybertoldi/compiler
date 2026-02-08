@@ -45,7 +45,7 @@ static TokenType match_var(const char *val){
     if (val_len == kwlen && strcmp(val, kw) == 0) 
       return kw_token;
   }
-  return TKTYPE_VAR;
+  return TKTYPE_NAME;
 }
 
 /*-----------------------DEFINICAO DOS ESTADOS-----------------------*/
@@ -79,7 +79,7 @@ static DfaNode q23 = BUILD_DFA_NODE_FINAL(TKTYPE_LEQT);
 static DfaNode q24 = BUILD_DFA_NODE_FINAL(TKTYPE_LOGIC_OR);
 static DfaNode q25 = BUILD_DFA_NODE_FINAL(TKTYPE_LOGIC_AND);
 
-static DfaNode q26 = BUILD_DFA_NODE_FINAL(TKTYPE_VAR);
+static DfaNode q26 = BUILD_DFA_NODE_FINAL(TKTYPE_NAME);
 static DfaNode q27 = BUILD_DFA_NODE_FINAL(TKTYPE_ATTRIBUTION);
 
 static DfaNode q28 =
@@ -222,7 +222,7 @@ TokenList *tokenize(char *eval){
     /*------------------------------------*/
     long type = curnode->type;
     char *copy_str = strndup(&eval[tknstart], n);
-    if (type == TKTYPE_VAR)
+    if (type == TKTYPE_NAME)
       type = match_var(copy_str);
 
     if (!curnode->is_final) {
@@ -272,7 +272,7 @@ char *type2str(TokenType t) {
   case TKTYPE_LOGIC_OR:      return "LOGIC_OR";
   case TKTYPE_LOGIC_AND:     return "LOGIC_AND";
   case TKTYPE_NEGATION:      return "NEGATION";
-  case TKTYPE_VAR:           return "VAR";
+  case TKTYPE_NAME:          return "NAME";
   case TKTYPE_ATTRIBUTION:   return "ATTRIBUTION";
   case TKTYPE_INT:           return "INT";
   case TKTYPE_FLOAT:         return "FLOAT";

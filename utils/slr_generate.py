@@ -257,7 +257,7 @@ src_fd.write(f"long goto_table[{len(nodes)+1}][VAR_NUM_VARS] = {{\n")
 for i, node in enumerate(nodes):
     p = []
     for entry, dest in node.goto.items():
-        entry_str = entry if isinstance(entry, str)\
+        entry_str = "TKTYPE_" + entry if isinstance(entry, str)\
                 else f"VAR_{entry.head.replace('\'', '_')}"
         p.append(f"[{entry_str}] = {nodes.index(dest) + 1}\n")
     src_fd.write(f"\t[{i+1}] = {{ {', '.join(p)} }},\n")
@@ -276,7 +276,8 @@ for i, node in enumerate(nodes):
     if kernel.pos + 1 == len(kernel.prod.production):
         fmt_head = "VAR_" + kernel.prod.head.replace('\'', '_')
         fmt_prods = [
-                val if isinstance(val,str) else "VAR_" + val.head.replace('\'', '_')
+                "TKTYPE_" + val if isinstance(val,str) \
+                        else "VAR_" + val.head.replace('\'', '_')\
                 for val in kernel.prod.production
         ]
         src_fd.write(f"\t[{i+1}] = PROD({fmt_head},   {', '.join(fmt_prods)}),\n")

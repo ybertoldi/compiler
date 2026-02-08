@@ -1,79 +1,98 @@
+<FUNC_DEF>      ::= <FUNC_DEC>  OPBRACKET  <STMTS> CLBRACKET;
+
+<FUNC_DEC> ::= <TIPO>  NAME  OPPAREN <FUNC_DEC_ARGS>  CLPAREN
+                  | <TIPO>  NAME OPPAREN CLPAREN;
+
+<FUNC_DEC_ARGS> ::= <FUNC_DEC_ARGS> COMMA <TIPO> NAME 
+                  | <TIPO> NAME;
+
 <STMTS> ::= <STMTS> <STMT> | <STMT>;
 <STMT>  ::= <DEC> 
-          | <EXPR> TKTYPE_SMCOLON
+          | <EXPR>  SMCOLON
           | <ASSIGN>
           | <IF>
           | <IF_ELSE>
           | <WHILE>;
 
+<WHILE> ::=  KW_WHILE  OPPAREN <EXPR>  CLPAREN
+             OPBRACKET <STMTS>  CLBRACKET;
 
-<WHILE> ::= TKTYPE_KW_WHILE TKTYPE_OPPAREN <EXPR> TKTYPE_CLPAREN
-            TKTYPE_OPBRACKET <STMTS> TKTYPE_CLBRACKET;
-<IF> ::= TKTYPE_KW_IF TKTYPE_OPPAREN <EXPR> TKTYPE_CLPAREN TKTYPE_OPBRACKET <STMTS> TKTYPE_CLBRACKET;
+<IF>    ::=  KW_IF  OPPAREN <EXPR>  CLPAREN  OPBRACKET <STMTS>  CLBRACKET;
+
 <IF_ELSE> ::=  <IF> <ELSE>;
-<ELSE> ::= TKTYPE_KW_ELSE TKTYPE_OPBRACKET <STMTS> TKTYPE_CLBRACKET
-         | TKTYPE_KW_ELSE <IF>;
 
-<DEC>    ::= <TIPO> TKTYPE_VAR TKTYPE_ATTRIBUTION <EXPR> TKTYPE_SMCOLON;
-<ASSIGN> ::= TKTYPE_VAR TKTYPE_ATTRIBUTION <EXPR> TKTYPE_SMCOLON;
+<ELSE>   ::=  KW_ELSE  OPBRACKET <STMTS>  CLBRACKET
+           |  KW_ELSE <IF>;
 
-<EXPR>  ::= <LOG_OR>
-          | <EXPR1>;
-<LOG_OR> ::= <EXPR> TKTYPE_LOGIC_OR <EXPR1>;
+<DEC>    ::= <TIPO>  NAME  ATTRIBUTION <EXPR>  SMCOLON;
+<ASSIGN> ::=  NAME ATTRIBUTION <EXPR>  SMCOLON;
 
-<EXPR1> ::= <LOG_AND>
-          | <EXPR2>;
-<LOG_AND> ::= <EXPR1> TKTYPE_LOGIC_AND <EXPR2>;
+
+
+<FUNC_CALL>      ::=  NAME OPPAREN <FUNC_CALL_ARGS>  CLPAREN;
+<FUNC_CALL_ARGS> ::= <FUNC_CALL_ARGS>  COMMA <EXPR> | <EXPR>;
+
+<EXPR>   ::= <LOG_OR>
+           | <EXPR1>;
+<LOG_OR> ::= <EXPR>  LOGIC_OR <EXPR1>;
+<EXPR1>   ::= <LOG_AND>
+            | <EXPR2>;
+<LOG_AND> ::= <EXPR1>  LOGIC_AND <EXPR2>;
 
 <EXPR2> ::= <CMP_EQ>
           | <CMP_NEQ>
           | <EXPR3>;
-<CMP_EQ>  ::= <EXPR2> TKTYPE_EQUALS <EXPR3>;
-<CMP_NEQ> ::= <EXPR2> TKTYPE_NEQUALS  <EXPR3>;
+
+<CMP_EQ>  ::= <EXPR2>  EQUALS   <EXPR3>;
+<CMP_NEQ> ::= <EXPR2>  NEQUALS  <EXPR3>;
 
 <EXPR3>  ::= <CMP_LT>
            | <CMP_LEQT>
            | <CMP_GT>
            | <CMP_GEQT>
            | <EXPR4>;
-<CMP_LT>   ::= <EXPR3> TKTYPE_LT <EXPR4>;
-<CMP_LEQT> ::= <EXPR3> TKTYPE_LEQT  <EXPR4>;
-<CMP_GT>   ::= <EXPR3> TKTYPE_GT    <EXPR4>;
-<CMP_GEQT> ::= <EXPR3> TKTYPE_GEQT  <EXPR4>;
+
+<CMP_LT>   ::= <EXPR3>  LT    <EXPR4>;
+<CMP_LEQT> ::= <EXPR3>  LEQT  <EXPR4>;
+<CMP_GT>   ::= <EXPR3>  GT    <EXPR4>;
+<CMP_GEQT> ::= <EXPR3>  GEQT  <EXPR4>;
 
 <EXPR4> ::= <SUM>
           | <SUB>
           | <EXPR5>;
-<SUM> ::= <EXPR4> TKTYPE_SUM  <EXPR5>;
-<SUB> ::= <EXPR4> TKTYPE_SUB  <EXPR5>;
+
+<SUM> ::= <EXPR4>  SUM  <EXPR5>;
+<SUB> ::= <EXPR4>  SUB  <EXPR5>;
 
 <EXPR5> ::= <MULT>
           | <DIV>
           | <EXPR6>;
-<MULT> ::= <EXPR5> TKTYPE_MULT  <EXPR6>;
-<DIV>  ::=  <EXPR5> TKTYPE_DIV   <EXPR6>;
+
+<MULT> ::= <EXPR5>  MULT  <EXPR6>;
+<DIV>  ::=  <EXPR5>  DIV   <EXPR6>;
 
 
-<EXPR6> ::= TKTYPE_VAR  
+<EXPR6> ::=  NAME 
           | <CONST> 
           | <PAREN_EXPR>
           | <FUNC_CALL>;
 
-<PAREN_EXPR> ::= TKTYPE_OPPAREN <EXPR> TKTYPE_CLPAREN;
-<FUNC_CALL> ::= TKTYPE_VAR TKTYPE_OPPAREN <ARGS> TKTYPE_CLPAREN;
-<ARGS> ::= <ARGS> TKTYPE_COMMA <EXPR> | <EXPR>;
+<PAREN_EXPR> ::=  OPPAREN <EXPR>  CLPAREN;
 
-<CONST> ::= TKTYPE_INT 
-          | TKTYPE_FLOAT 
-          | TKTYPE_HEXINT 
-          | TKTYPE_OCTALINT 
-          | TKTYPE_STRLIT
-          | TKTYPE_KW_FALSE 
-          | TKTYPE_KW_TRUE;
 
-<TIPO>  ::= TKTYPE_KW_INT 
-          | TKTYPE_KW_CHAR 
-          | TKTYPE_KW_BOOL 
-          | TKTYPE_KW_LONG 
-          | TKTYPE_KW_FLOAT 
-          | TKTYPE_KW_DOUBLE;
+
+<CONST> ::=  INT 
+          |  FLOAT 
+          |  HEXINT 
+          |  OCTALINT 
+          |  STRLIT
+          |  KW_FALSE 
+          |  KW_TRUE;
+
+<TIPO>  ::=  KW_INT 
+          |  KW_CHAR 
+          |  KW_BOOL 
+          |  KW_LONG 
+          |  KW_FLOAT 
+          |  KW_DOUBLE
+          |  KW_VOID;

@@ -7,6 +7,13 @@
 
 typedef enum {
   ASTYPE_TERMINAL, 
+
+  // constant values
+  ASTYPE_CONST_INT,
+  ASTYPE_CONST_FLOAT,
+  ASTYPE_CONST_BOOL,
+  ASTYPE_CONST_STRING,
+
   ASTYPE_BINOP,
   ASTTYPE_LITERAL_TYPE,
   ASTYPE_DECLARATION,
@@ -15,7 +22,11 @@ typedef enum {
   ASTYPE_ASSIGN,
   ASTYPE_IF,
   ASTYPE_FUNCARGS,
-  ASTYPE_FUNCALL
+  ASTYPE_FUNCALL,
+
+  ASTYPE_FUNCDEC,
+  ASTYPE_FUNCDEF,
+  ASTYPE_FUNCPARAMS
 } AstNodeType;
 
 
@@ -26,6 +37,7 @@ typedef enum{
   PTYPE_LONG,
   PTYPE_DOUBLE,
   PTYPE_FLOAT,
+  PTYPE_VOID
 } PrimType;
 
 typedef enum {
@@ -81,7 +93,6 @@ typedef struct AstNode {
       char *varname;
       struct AstNode *init_expr;
     }; // declaracao
-  
 
     struct {
       struct AstNode *w_cond;
@@ -100,12 +111,23 @@ typedef struct AstNode {
     }; // if-else
     
     struct{
-       char *func_name;
+       char *funcall_name;
        DynamicArray(struct AstNode *) args;
     }; // func-call
+
+    struct {
+      char *funcdec_name;
+      struct AstNode *ret_type;
+      DynamicArray(struct AstNode *) params;
+    }; // func-dec
+  
+    struct {
+      struct AstNode* func_decl;
+      struct AstNode* func_stmts;
+    }; // func-def 
     
   };
-} AstNode ;
+} AstNode;
 
 extern void grammar_test(char *);
 #endif // AST_H
